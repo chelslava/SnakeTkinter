@@ -61,17 +61,17 @@ def draw_food():
         food[0], food[1],     # Верхний левый угол (x1, y1)
         food[0] + CELL_SIZE,  # x-координата правого края
         food[1] + CELL_SIZE,  # y-координата нижнего края
-        fill="blue"           # Цвет заливки
+        fill="orange"         # Цвет заливки
     )
 
 #Отрисовка змейки
 def draw_snake():
-    for segment in snake:
+    for index,segment in enumerate(snake):
         canvas.create_rectangle(
             segment[0], segment[1],  # Верхний левый угол
             segment[0] + CELL_SIZE,  # Нижний правый угол (x)
             segment[1] + CELL_SIZE,  # Нижний правый угол (y)
-            fill="green",            # Цвет заливки
+            fill="lime" if index == 0 else "green",      # Цвет заливки змеи зеленый, голова - ярко-зеленая
             outline="darkgreen"      # Цвет обводки
         )
 
@@ -97,7 +97,7 @@ def restart_game():
     update_title()
 
     # Перезапускаем игровой цикл
-    root.after(DELAY, game_loop)
+    start_countdown()
 
 
 def on_key_press(event):
@@ -170,6 +170,29 @@ def end_game():
 def update_title():
     root.title(f"Snake | Счёт: {score}")
 
+
+def start_countdown():
+    countdown_numbers = ["3", "2", "1", "Старт!"]
+
+    def show_next(index):
+        canvas.delete("countdown")
+        if index < len(countdown_numbers):
+            canvas.create_rectangle(0, 0, WIDTH, HEIGHT, fill="#000", tags="countdown")
+            canvas.create_text(
+                WIDTH // 2, HEIGHT // 2,
+                text=countdown_numbers[index],
+                fill="white",
+                font=("Arial", 32, "bold"),
+                tags="countdown"
+            )
+            root.after(1000, show_next, index + 1)
+        else:
+            canvas.delete("countdown")
+            game_loop()  # Запускаем игру после отсчёта
+
+    show_next(0)
+
+
 # Игровой цикл
 def game_loop():
     global snake, food, score
@@ -194,6 +217,9 @@ def game_loop():
 #Первоначальная отрисовка
 draw_food()
 draw_snake()
-root.after(DELAY, game_loop)
-#Запуск главного цикла программы
+
+# Запускаем обратный отсчёт вместо немедленного старта игры
+start_countdown()
+
+# Запуск главного цикла программы
 root.mainloop()
