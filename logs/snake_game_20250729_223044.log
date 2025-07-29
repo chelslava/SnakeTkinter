@@ -1,0 +1,26 @@
+2025-07-29 22:30:47,014 - DEBUG - wrapper:342 - matplotlib data path: D:\Python\SnakeTkinter\.venv\lib\site-packages\matplotlib\mpl-data
+2025-07-29 22:30:47,021 - DEBUG - wrapper:342 - CONFIGDIR=C:\Users\user\.matplotlib
+2025-07-29 22:30:47,023 - DEBUG - <module>:1557 - interactive is False
+2025-07-29 22:30:47,023 - DEBUG - <module>:1558 - platform is win32
+2025-07-29 22:30:47,120 - DEBUG - wrapper:342 - CACHEDIR=C:\Users\user\.matplotlib
+2025-07-29 22:30:47,124 - DEBUG - _load_fontmanager:1635 - Using fontManager instance from C:\Users\user\.matplotlib\fontlist-v390.json
+2025-07-29 22:30:52,204 - INFO - log_performance:59 - Performance: game_loop took 0.027s
+2025-07-29 22:30:52,338 - INFO - log_performance:59 - Performance: game_loop took 0.010s
+2025-07-29 22:30:52,456 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:30:52,576 - INFO - log_performance:59 - Performance: game_loop took 0.013s
+2025-07-29 22:30:52,693 - INFO - log_performance:59 - Performance: game_loop took 0.009s
+2025-07-29 22:30:52,804 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:30:52,915 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:30:53,025 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:30:53,133 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:30:53,244 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:30:53,353 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:30:53,511 - INFO - log_performance:59 - Performance: game_loop took 0.039s
+2025-07-29 22:30:53,623 - INFO - log_performance:59 - Performance: game_loop took 0.008s
+2025-07-29 22:30:53,758 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:30:53,871 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:30:53,976 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:30:54,092 - INFO - log_performance:59 - Performance: game_loop took 0.008s
+2025-07-29 22:30:54,215 - INFO - log_performance:59 - Performance: game_loop took 0.008s
+2025-07-29 22:30:54,337 - INFO - log_game_event:45 - Game Event: game_saved - {'score': 0, 'length': 3, 'duration': 0}
+2025-07-29 22:30:54,338 - INFO - log_game_event:45 - Game Event: game_ended - {'score': 0, 'length': 3, 'duration': 0, 'ai_mode': False, 'ai_helper': False, 'game_mode': 'classic'}

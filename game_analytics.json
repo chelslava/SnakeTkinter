@@ -1,0 +1,31 @@
+{
+  "scores": [
+    0,
+    2,
+    0,
+    6,
+    1,
+    0,
+    12
+  ],
+  "durations": [
+    0,
+    26.025350332260132,
+    9.330209970474243,
+    27.281573057174683,
+    10.185959577560425,
+    38.43422889709473,
+    72.24581575393677
+  ],
+  "performance_metrics": {
+    "best_score": 12,
+    "avg_score": 3.0,
+    "total_games": 7,
+    "avg_duration": 26.214733941214426,
+    "score_trend": 1.8,
+    "efficiency_trend": 0
+  },
+  "player_behavior": {},
+  "patterns": {},
+  "last_updated": 1753818608.5991476
+}

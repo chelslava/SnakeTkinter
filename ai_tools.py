@@ -1,6 +1,8 @@
 import math
 import random
 import time
+import heapq
+from functools import lru_cache
 
 
 class AdvancedSnakeAI:
@@ -10,35 +12,55 @@ class AdvancedSnakeAI:
         self.memory = {}  # Кэш для запоминания решений
         self.learning_rate = 0.1
         self.exploration_rate = 0.2
+        self.path_cache = {}  # Кэш для путей
+        self.cache_size_limit = 1000
 
-    def a_star_pathfinding(self, snake, food, obstacles, max_iterations=1000):
-        """Алгоритм A* для поиска кратчайшего пути к еде"""
+    def a_star_pathfinding_optimized(self, snake, food, obstacles, max_iterations=500):
+        """Оптимизированный A* с приоритетной очередью и кэшированием"""
         start = snake[0]
         goal = food
 
         if start == goal:
             return []
 
+        # Проверяем кэш
+        cache_key = self.create_cache_key(snake, food, obstacles)
+        if cache_key in self.path_cache:
+            return self.path_cache[cache_key]
+
+        # Используем heapq для эффективной работы с приоритетной очередью
         open_set = [(0, start)]  # (f_score, position)
         came_from = {}
         g_score = {start: 0}
         f_score = {start: self.heuristic(start, goal)}
+        closed_set = set()  # Для оптимизации
 
         iterations = 0
 
         while open_set and iterations < max_iterations:
             iterations += 1
-            current_f, current = min(open_set)
-            open_set.remove((current_f, current))
+            current_f, current = heapq.heappop(open_set)
+            
+            if current in closed_set:
+                continue
+                
+            closed_set.add(current)
 
             if current == goal:
-                return self.reconstruct_path(came_from, current)
+                path = self.reconstruct_path(came_from, current)
+                # Сохраняем в кэш
+                self.path_cache[cache_key] = path
+                self.manage_cache_size()
+                return path
 
+            # Оптимизация: проверяем только валидные соседние позиции
             for direction in ["Up", "Down", "Left", "Right"]:
                 neighbor = self.get_next_position(current, direction)
 
-                # Проверяем валидность позиции
                 if not self.is_valid_position(neighbor, snake, obstacles):
+                    continue
+
+                if neighbor in closed_set:
                     continue
 
                 tentative_g = g_score[current] + 1
@@ -48,14 +70,39 @@ class AdvancedSnakeAI:
                     g_score[neighbor] = tentative_g
                     f_score[neighbor] = tentative_g + self.heuristic(neighbor, goal)
 
-                    if neighbor not in [pos for _, pos in open_set]:
-                        open_set.append((f_score[neighbor], neighbor))
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
 
-        return None  # Путь не найден
+        # Путь не найден
+        self.path_cache[cache_key] = None
+        self.manage_cache_size()
+        return None
+
+    def create_cache_key(self, snake, food, obstacles):
+        """Создание ключа для кэширования путей"""
+        head = snake[0]
+        # Упрощенный ключ для экономии памяти
+        return f"{head}_{food}_{len(obstacles)}"
+
+    def manage_cache_size(self):
+        """Управление размером кэша"""
+        if len(self.path_cache) > self.cache_size_limit:
+            # Удаляем старые записи
+            old_keys = list(self.path_cache.keys())[:self.cache_size_limit // 2]
+            for key in old_keys:
+                del self.path_cache[key]
+
+    @lru_cache(maxsize=1000)
+    def cached_heuristic(self, pos1, pos2):
+        """Кэшированная эвристическая функция"""
+        return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+
+    def a_star_pathfinding(self, snake, food, obstacles, max_iterations=1000):
+        """Алгоритм A* для поиска кратчайшего пути к еде (оптимизированная версия)"""
+        return self.a_star_pathfinding_optimized(snake, food, obstacles, max_iterations)
 
     def heuristic(self, pos1, pos2):
         """Манхэттенское расстояние между двумя точками"""
-        return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+        return self.cached_heuristic(pos1, pos2)
 
     def get_next_position(self, pos, direction):
         """Получить следующую позицию при движении в заданном направлении"""

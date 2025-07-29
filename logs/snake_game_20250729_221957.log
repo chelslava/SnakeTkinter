@@ -1,0 +1,6 @@
+2025-07-29 22:19:59,997 - DEBUG - wrapper:342 - matplotlib data path: D:\Python\SnakeTkinter\.venv\lib\site-packages\matplotlib\mpl-data
+2025-07-29 22:20:00,014 - DEBUG - wrapper:342 - CONFIGDIR=C:\Users\user\.matplotlib
+2025-07-29 22:20:00,016 - DEBUG - <module>:1557 - interactive is False
+2025-07-29 22:20:00,017 - DEBUG - <module>:1558 - platform is win32
+2025-07-29 22:20:00,156 - DEBUG - wrapper:342 - CACHEDIR=C:\Users\user\.matplotlib
+2025-07-29 22:20:00,160 - DEBUG - _load_fontmanager:1635 - Using fontManager instance from C:\Users\user\.matplotlib\fontlist-v390.json

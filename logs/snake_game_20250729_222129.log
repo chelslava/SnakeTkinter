@@ -1,0 +1,460 @@
+2025-07-29 22:21:32,056 - DEBUG - wrapper:342 - matplotlib data path: D:\Python\SnakeTkinter\.venv\lib\site-packages\matplotlib\mpl-data
+2025-07-29 22:21:32,073 - DEBUG - wrapper:342 - CONFIGDIR=C:\Users\user\.matplotlib
+2025-07-29 22:21:32,074 - DEBUG - <module>:1557 - interactive is False
+2025-07-29 22:21:32,074 - DEBUG - <module>:1558 - platform is win32
+2025-07-29 22:21:32,143 - DEBUG - wrapper:342 - CACHEDIR=C:\Users\user\.matplotlib
+2025-07-29 22:21:32,149 - DEBUG - _load_fontmanager:1635 - Using fontManager instance from C:\Users\user\.matplotlib\fontlist-v390.json
+2025-07-29 22:21:37,083 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:21:37,191 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:37,302 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:37,413 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:37,523 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:37,635 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:37,751 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:37,852 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:37,963 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:38,073 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:38,184 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:38,294 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:21:38,411 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:38,522 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:38,626 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:38,735 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:38,845 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:38,951 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:21:39,054 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:39,156 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:39,262 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:39,376 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:39,478 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:39,579 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:39,690 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:21:39,796 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:39,899 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:40,020 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:40,125 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:40,235 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:40,345 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:40,454 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:40,555 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:40,659 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:40,771 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:21:40,882 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:21:40,990 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:41,099 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:41,211 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:41,317 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:41,431 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:41,539 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:41,651 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:21:41,759 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:41,871 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:41,978 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:42,091 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:42,193 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:42,296 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:42,411 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:42,516 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:42,630 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:42,736 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:42,847 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:42,957 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:43,059 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:43,161 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:43,270 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:43,379 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:43,491 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:43,602 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:43,703 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:43,804 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:43,906 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:44,009 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:44,115 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:44,221 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:44,325 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:44,431 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:44,541 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:44,652 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:44,762 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:44,871 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 63.245553203367585}
+2025-07-29 22:21:44,872 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:44,973 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 53.85164807134504}
+2025-07-29 22:21:44,973 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:45,076 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 50.99019513592785}
+2025-07-29 22:21:45,077 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:45,181 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 50.0}
+2025-07-29 22:21:45,184 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:21:45,289 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 40.0}
+2025-07-29 22:21:45,293 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:45,398 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 30.0}
+2025-07-29 22:21:45,400 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:21:45,503 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 20.0}
+2025-07-29 22:21:45,504 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:45,610 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 10.0}
+2025-07-29 22:21:45,611 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:45,728 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 4, 'food_distance': 44.721359549995796}
+2025-07-29 22:21:45,731 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:21:45,839 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 4, 'food_distance': 41.23105625617661}
+2025-07-29 22:21:45,843 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:21:45,947 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 4, 'food_distance': 40.0}
+2025-07-29 22:21:45,952 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:21:46,054 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 4, 'food_distance': 30.0}
+2025-07-29 22:21:46,056 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:46,167 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 4, 'food_distance': 20.0}
+2025-07-29 22:21:46,172 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:46,273 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 4, 'food_distance': 10.0}
+2025-07-29 22:21:46,274 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:46,380 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 337.34255586866}
+2025-07-29 22:21:46,384 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:21:46,492 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 335.4101966249685}
+2025-07-29 22:21:46,494 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:46,604 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 333.7663853655727}
+2025-07-29 22:21:46,609 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:46,715 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 332.41540277189324}
+2025-07-29 22:21:46,716 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:46,818 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 331.3608305156178}
+2025-07-29 22:21:46,819 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:46,920 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 330.6055050963308}
+2025-07-29 22:21:46,922 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:47,022 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 330.15148038438355}
+2025-07-29 22:21:47,024 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:47,126 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 330.0}
+2025-07-29 22:21:47,131 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:21:47,231 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 320.0}
+2025-07-29 22:21:47,232 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:47,335 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 310.0}
+2025-07-29 22:21:47,337 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:47,450 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 300.0}
+2025-07-29 22:21:47,451 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:21:47,553 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 290.0}
+2025-07-29 22:21:47,554 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:47,655 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 280.0}
+2025-07-29 22:21:47,657 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:47,763 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 270.0}
+2025-07-29 22:21:47,765 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:47,871 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 260.0}
+2025-07-29 22:21:47,873 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:47,979 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 250.0}
+2025-07-29 22:21:47,980 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:48,083 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 240.0}
+2025-07-29 22:21:48,088 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:21:48,192 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 230.0}
+2025-07-29 22:21:48,194 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:48,294 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 220.0}
+2025-07-29 22:21:48,295 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:48,396 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 210.0}
+2025-07-29 22:21:48,397 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:48,508 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 200.0}
+2025-07-29 22:21:48,511 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:48,614 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 190.0}
+2025-07-29 22:21:48,616 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:48,721 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 180.0}
+2025-07-29 22:21:48,722 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:48,828 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 170.0}
+2025-07-29 22:21:48,832 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:21:48,932 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 160.0}
+2025-07-29 22:21:48,934 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:49,036 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 150.0}
+2025-07-29 22:21:49,038 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:21:49,139 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 140.0}
+2025-07-29 22:21:49,140 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:49,250 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 130.0}
+2025-07-29 22:21:49,252 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:21:49,358 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 120.0}
+2025-07-29 22:21:49,359 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:49,463 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 110.0}
+2025-07-29 22:21:49,464 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:21:49,570 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 100.0}
+2025-07-29 22:21:49,571 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:21:49,672 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 90.0}
+2025-07-29 22:21:49,674 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:49,782 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 80.0}
+2025-07-29 22:21:49,784 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:21:49,889 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 70.0}
+2025-07-29 22:21:49,894 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:22:32,330 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 60.0}
+2025-07-29 22:22:32,332 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:32,447 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 50.0}
+2025-07-29 22:22:32,451 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:22:32,552 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 40.0}
+2025-07-29 22:22:32,553 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:32,661 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 30.0}
+2025-07-29 22:22:32,664 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:32,771 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 20.0}
+2025-07-29 22:22:32,773 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:32,874 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 10.0}
+2025-07-29 22:22:32,875 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:32,977 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 367.96738985948195}
+2025-07-29 22:22:32,978 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:33,085 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 360.69377593742865}
+2025-07-29 22:22:33,091 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:22:33,192 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 353.83612025908263}
+2025-07-29 22:22:33,195 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:33,301 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 347.1310991541956}
+2025-07-29 22:22:33,303 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:33,412 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 340.58772731852804}
+2025-07-29 22:22:33,414 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:33,520 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 334.21549934136806}
+2025-07-29 22:22:33,522 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:33,630 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 328.0243893371345}
+2025-07-29 22:22:33,632 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:33,739 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 322.02484376209236}
+2025-07-29 22:22:33,743 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:33,848 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 316.22776601683796}
+2025-07-29 22:22:33,851 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:33,957 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 310.64449134018133}
+2025-07-29 22:22:33,959 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:34,070 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 305.28675044947494}
+2025-07-29 22:22:34,071 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:34,176 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 300.1666203960727}
+2025-07-29 22:22:34,177 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:34,288 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 295.296461204668}
+2025-07-29 22:22:34,291 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:34,396 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 290.68883707497264}
+2025-07-29 22:22:34,399 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:34,507 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 286.35642126552705}
+2025-07-29 22:22:34,511 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:22:34,614 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 282.3118842698621}
+2025-07-29 22:22:34,617 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:34,723 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 278.5677655436824}
+2025-07-29 22:22:34,725 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:34,830 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 275.13632984395207}
+2025-07-29 22:22:34,832 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:34,937 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 272.02941017470886}
+2025-07-29 22:22:34,938 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:35,040 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 269.2582403567252}
+2025-07-29 22:22:35,043 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:35,150 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 266.8332812825267}
+2025-07-29 22:22:35,153 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:22:35,261 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 264.76404589747455}
+2025-07-29 22:22:35,264 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:35,375 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 263.0589287593181}
+2025-07-29 22:22:35,377 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:35,478 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 261.72504656604804}
+2025-07-29 22:22:35,479 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:35,582 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 260.76809620810593}
+2025-07-29 22:22:35,587 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:35,690 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 260.1922366251537}
+2025-07-29 22:22:35,692 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:35,796 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 260.0}
+2025-07-29 22:22:35,797 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:35,902 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 250.0}
+2025-07-29 22:22:35,904 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:36,007 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 240.0}
+2025-07-29 22:22:36,011 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:22:36,114 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 230.0}
+2025-07-29 22:22:36,116 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:36,217 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 220.0}
+2025-07-29 22:22:36,219 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:36,327 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 210.0}
+2025-07-29 22:22:36,332 - INFO - log_performance:59 - Performance: game_loop took 0.007s
+2025-07-29 22:22:36,435 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 200.0}
+2025-07-29 22:22:36,436 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:36,541 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 190.0}
+2025-07-29 22:22:36,543 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:36,651 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 180.0}
+2025-07-29 22:22:36,652 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:36,754 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 170.0}
+2025-07-29 22:22:36,755 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:36,856 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 160.0}
+2025-07-29 22:22:36,857 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:36,960 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 150.0}
+2025-07-29 22:22:36,961 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:37,072 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 140.0}
+2025-07-29 22:22:37,074 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:37,176 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 130.0}
+2025-07-29 22:22:37,177 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:37,278 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 120.0}
+2025-07-29 22:22:37,280 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:37,381 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 110.0}
+2025-07-29 22:22:37,382 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:37,492 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 100.0}
+2025-07-29 22:22:37,494 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:37,601 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 90.0}
+2025-07-29 22:22:37,602 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:37,705 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 80.0}
+2025-07-29 22:22:37,710 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:22:37,822 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 70.0}
+2025-07-29 22:22:37,824 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:37,930 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 60.0}
+2025-07-29 22:22:37,932 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:38,041 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 50.0}
+2025-07-29 22:22:38,042 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:38,153 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 6, 'food_distance': 40.0}
+2025-07-29 22:22:38,153 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:38,255 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 136.01470508735443}
+2025-07-29 22:22:38,257 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:38,367 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 126.49110640673517}
+2025-07-29 22:22:38,370 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:38,471 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 123.69316876852982}
+2025-07-29 22:22:38,473 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:38,574 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 121.6552506059644}
+2025-07-29 22:22:38,575 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:38,679 - DEBUG - log_ai_decision:55 - AI Decision: Left - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 120.41594578792295}
+2025-07-29 22:22:38,680 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:38,784 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 120.0}
+2025-07-29 22:22:38,790 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:22:38,892 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 110.0}
+2025-07-29 22:22:38,894 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:39,002 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 100.0}
+2025-07-29 22:22:39,003 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:39,104 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 90.0}
+2025-07-29 22:22:39,106 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:39,210 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 80.0}
+2025-07-29 22:22:39,212 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:39,312 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 70.0}
+2025-07-29 22:22:39,313 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:39,414 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 60.0}
+2025-07-29 22:22:39,415 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:39,519 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 50.0}
+2025-07-29 22:22:39,521 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:39,629 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 40.0}
+2025-07-29 22:22:39,633 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:39,738 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 30.0}
+2025-07-29 22:22:39,741 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:39,847 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 20.0}
+2025-07-29 22:22:39,852 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:22:39,953 - DEBUG - log_ai_decision:55 - AI Decision: Up - State: {'ai_type': 'a_star', 'snake_length': 3, 'food_distance': 10.0}
+2025-07-29 22:22:39,955 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:40,059 - DEBUG - log_ai_decision:55 - AI Decision: Right - State: {'ai_type': 'a_star', 'snake_length': 4, 'food_distance': 10.0}
+2025-07-29 22:22:40,098 - INFO - log_performance:59 - Performance: game_loop took 0.038s
+2025-07-29 22:22:40,202 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 314.00636936215164}
+2025-07-29 22:22:40,203 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:40,304 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 304.138126514911}
+2025-07-29 22:22:40,309 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:40,415 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 294.27877939124323}
+2025-07-29 22:22:40,417 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:40,521 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 284.42925306655786}
+2025-07-29 22:22:40,523 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:40,631 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 274.5906043549196}
+2025-07-29 22:22:40,632 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:40,742 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 264.76404589747455}
+2025-07-29 22:22:40,743 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:40,850 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 254.95097567963924}
+2025-07-29 22:22:40,852 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:40,959 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 245.15301344262525}
+2025-07-29 22:22:40,961 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:41,064 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 235.3720459187964}
+2025-07-29 22:22:41,070 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:41,171 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 225.61028345356956}
+2025-07-29 22:22:41,172 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:41,273 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 215.87033144922904}
+2025-07-29 22:22:41,276 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:41,380 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 206.15528128088303}
+2025-07-29 22:22:41,382 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:41,485 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 196.468827043885}
+2025-07-29 22:22:41,492 - INFO - log_performance:59 - Performance: game_loop took 0.008s
+2025-07-29 22:22:41,597 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 186.81541692269406}
+2025-07-29 22:22:41,598 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:41,701 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 177.2004514666935}
+2025-07-29 22:22:41,702 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:41,807 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 167.6305461424021}
+2025-07-29 22:22:41,811 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:22:41,913 - DEBUG - log_ai_decision:55 - AI Decision: Down - State: {'ai_type': 'a_star', 'snake_length': 5, 'food_distance': 158.11388300841898}
+2025-07-29 22:22:41,914 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:42,025 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:42,132 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:42,234 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:42,274 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:42,340 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:42,379 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:42,443 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:22:42,483 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:42,553 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:42,590 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:22:42,667 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:42,694 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:42,773 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:42,805 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:42,883 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:42,912 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:42,994 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:43,020 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:43,098 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:43,133 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:43,202 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:22:43,241 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:43,315 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:43,350 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:22:43,432 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:43,460 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:43,539 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:43,573 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:43,650 - INFO - log_performance:59 - Performance: game_loop took 0.006s
+2025-07-29 22:22:43,676 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:43,755 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:43,786 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:43,862 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:43,894 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:43,972 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:43,999 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:44,076 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:44,100 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:22:44,177 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:44,211 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:22:44,283 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:44,314 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:44,391 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:22:44,418 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:44,492 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:22:44,521 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:44,599 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:44,625 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:44,702 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:44,732 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:44,804 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:44,839 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:54,555 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:54,660 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:54,771 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:54,880 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:54,982 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:55,086 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:55,191 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:55,301 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:55,412 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:55,520 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:55,632 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:55,743 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:55,850 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:55,952 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:56,055 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:56,159 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:56,263 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:56,373 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:56,484 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:56,590 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:22:56,692 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:56,794 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:56,895 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:56,999 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:57,111 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:57,214 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:22:57,323 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:57,431 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:57,533 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:57,643 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:57,748 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:57,854 - INFO - log_performance:59 - Performance: game_loop took 0.003s
+2025-07-29 22:22:57,956 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:58,061 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:58,163 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:58,273 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:58,376 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:58,481 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:58,585 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:58,692 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:58,800 - INFO - log_performance:59 - Performance: game_loop took 0.002s
+2025-07-29 22:22:58,911 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:59,016 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:59,126 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:22:59,235 - INFO - log_performance:59 - Performance: game_loop took 0.000s
+2025-07-29 22:22:59,351 - INFO - log_performance:59 - Performance: game_loop took 0.005s
+2025-07-29 22:22:59,455 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:59,561 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:59,664 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:59,772 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:22:59,874 - INFO - log_performance:59 - Performance: game_loop took 0.001s
+2025-07-29 22:22:59,982 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:23:00,088 - INFO - log_performance:59 - Performance: game_loop took 0.004s
+2025-07-29 22:23:00,196 - INFO - log_performance:59 - Performance: game_loop took 0.003s

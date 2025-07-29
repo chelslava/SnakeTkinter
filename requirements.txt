@@ -1,3 +1,6 @@
 tk
 matplotlib
 pytest
+numpy
+scikit-learn
+pandas
