@@ -1,7 +1,7 @@
+import heapq
 import math
 import random
 import time
-import heapq
 from functools import lru_cache
 
 
@@ -40,10 +40,10 @@ class AdvancedSnakeAI:
         while open_set and iterations < max_iterations:
             iterations += 1
             current_f, current = heapq.heappop(open_set)
-            
+
             if current in closed_set:
                 continue
-                
+
             closed_set.add(current)
 
             if current == goal:
@@ -91,8 +91,10 @@ class AdvancedSnakeAI:
             for key in old_keys:
                 del self.path_cache[key]
 
+    # pylint: disable=no-self-argument
+    @staticmethod
     @lru_cache(maxsize=1000)
-    def cached_heuristic(self, pos1, pos2):
+    def cached_heuristic(pos1, pos2):
         """Кэшированная эвристическая функция"""
         return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
@@ -133,10 +135,7 @@ class AdvancedSnakeAI:
             return False
 
         # Проверка столкновения с препятствиями
-        if pos in obstacles:
-            return False
-
-        return True
+        return pos not in obstacles
 
     def reconstruct_path(self, came_from, current):
         """Восстановление пути из словаря came_from"""
@@ -153,7 +152,7 @@ class AdvancedSnakeAI:
         future_positions = []
         current_pos = head
 
-        for step in range(steps):
+        for _step in range(steps):
             current_pos = self.get_next_position(current_pos, direction)
             if not self.is_valid_position(current_pos, snake, obstacles):
                 return True  # Столкновение предсказано
@@ -186,7 +185,7 @@ class AdvancedSnakeAI:
     def generate_strategic_advice(self, snake, food, obstacles):
         """Генерация стратегических советов"""
         advice = []
-        head = snake[0]
+        snake[0]
 
         # Анализ текущей ситуации
         survival_prob = self.calculate_survival_probability(snake, food, obstacles)

@@ -50,7 +50,7 @@ ignore = [
 known-first-party = ["ai_tools", "neural_ai", "game_modes", "logger", "advanced_analytics", "ui_enhancements"]
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_ignores = true
 disallow_untyped_defs = false
