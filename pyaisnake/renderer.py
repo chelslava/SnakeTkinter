@@ -15,27 +15,27 @@ class CLIRenderer:
     Rich-based CLI renderer for Snake game with smooth rendering.
     """
 
-    # Unicode symbols - using double-width for consistent sizing
+    # Unicode symbols - all double-width for consistent grid
     SYMBOLS = {
-        "head": "●",
-        "body": "●",
-        "food": "★",
-        "obstacle": "█",
+        "head": "██",
+        "body": "▓▓",
+        "food": "🍎",
+        "obstacle": "▒▒",
         "empty": "  ",
-        "border_h": "──",
-        "border_v": "│",
-        "border_tl": "┌",
-        "border_tr": "┐",
-        "border_bl": "└",
-        "border_br": "┘",
+        "border_h": "══",
+        "border_v": "║",
+        "border_tl": "╔",
+        "border_tr": "╗",
+        "border_bl": "╚",
+        "border_br": "╝",
     }
 
     # ASCII fallback
     ASCII_SYMBOLS = {
-        "head": "@",
-        "body": "o",
-        "food": "*",
-        "obstacle": "#",
+        "head": "@@",
+        "body": "oo",
+        "food": "**",
+        "obstacle": "##",
         "empty": "  ",
         "border_h": "--",
         "border_v": "|",
@@ -49,9 +49,9 @@ class CLIRenderer:
     COLORS = {
         "head": "bold bright_green",
         "body": "green",
-        "food": "bold bright_red",
+        "food": "bold bright_red on red",
         "obstacle": "dim yellow",
-        "border": "dim white",
+        "border": "bright_white",
         "empty": "black",
     }
 
@@ -96,22 +96,16 @@ class CLIRenderer:
 
     def _generate_frame(self) -> Panel:
         """Generate complete frame as Panel"""
-        # Build game field
         game_content = self._render_game_field()
-
-        # Build stats
         stats_content = self._render_stats()
 
-        # Combine into table
         layout = Table(show_header=False, show_edge=False, expand=False)
         layout.add_column()
         layout.add_column()
         layout.add_row(game_content, stats_content)
 
-        # Main panel with title
         title = "[bold bright_green]PyAISnake[/bold bright_green]"
 
-        # Add state indicator to title
         if self.game.state == GameState.PAUSED:
             title += " [bold yellow]⏸ PAUSED[/bold yellow]"
         elif self.game.state == GameState.GAME_OVER:
@@ -126,17 +120,18 @@ class CLIRenderer:
         )
 
     def _render_game_field(self) -> str:
-        """Render game field as string"""
+        """Render game field as string with consistent grid"""
         lines = []
         config = self.game.config
 
-        # Top border
+        # Top border - double width characters
         border = self.symbols["border_h"] * config.width
         lines.append(f"{self.symbols['border_tl']}{border}{self.symbols['border_tr']}")
 
-        # Pre-compute snake positions for O(1) lookup
+        # Pre-compute for O(1) lookup
         snake_set = set(self.game.snake)
         head = self.game.snake[0] if self.game.snake else None
+        food = self.game.food
 
         # Game field
         for y in range(config.height):
@@ -149,7 +144,7 @@ class CLIRenderer:
                     row_parts.append(self._colorize(self.symbols["head"], "head"))
                 elif pos in snake_set:
                     row_parts.append(self._colorize(self.symbols["body"], "body"))
-                elif pos == self.game.food:
+                elif pos == food:
                     row_parts.append(self._colorize(self.symbols["food"], "food"))
                 elif pos in self.game.obstacles:
                     row_parts.append(self._colorize(self.symbols["obstacle"], "obstacle"))
@@ -186,7 +181,6 @@ class CLIRenderer:
         if stats.moves > 0:
             table.add_row("Efficiency", f"{stats.efficiency:.1%}")
 
-        # Direction indicator
         dir_arrows = {
             Direction.UP: "↑",
             Direction.DOWN: "↓",
@@ -196,7 +190,6 @@ class CLIRenderer:
         arrow = dir_arrows.get(self.game.direction, "?")
         table.add_row("Direction", f"[bold]{arrow}[/bold]")
 
-        # Safe moves
         safe = self.game.get_safe_directions()
         safe_colors = {0: "red", 1: "yellow", 2: "green", 3: "bright_green", 4: "bright_green"}
         safe_color = safe_colors.get(len(safe), "white")
