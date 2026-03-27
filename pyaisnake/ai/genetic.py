@@ -2,7 +2,6 @@ import math
 import os
 import pickle
 import random
-from typing import Optional
 
 
 class Genome:
@@ -64,7 +63,7 @@ class GeneticSnakeAI:
         self.best_fitness: float = 0.0
         self.avg_fitness: float = 0.0
         self.history: list[dict] = []
-        self.best_genome: Optional[Genome] = None
+        self.best_genome: Genome | None = None
 
         self.current_genome_index = 0
         self.genome_scores: list[int] = []
@@ -176,8 +175,8 @@ class GeneticSnakeAI:
         return not self._is_valid_position(new_pos, snake, obstacles)
 
     def get_decision(
-        self, genome: Optional[Genome], snake: list, food: tuple, obstacles: list
-    ) -> Optional[str]:
+        self, genome: Genome | None, snake: list, food: tuple, obstacles: list
+    ) -> str | None:
         """Получение решения от генома"""
         if genome is None:
             genome = self.get_best_genome()
@@ -321,7 +320,7 @@ class GeneticSnakeAI:
             return self.best_genome
         return max(self.population, key=lambda g: g.fitness)
 
-    def get_current_genome(self) -> Optional[Genome]:
+    def get_current_genome(self) -> Genome | None:
         """Получить текущий геном для тестирования"""
         if self.current_genome_index < len(self.population):
             return self.population[self.current_genome_index]

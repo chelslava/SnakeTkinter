@@ -1,164 +1,211 @@
-# 🐍 PyAISnake - Игра с искусственным интеллектом
+# 🐍 PyAISnake - CLI Snake Game with AI
 
-Современная реализация классической игры Snake с продвинутыми алгоритмами ИИ, аналитикой и множеством игровых режимов.
+Modern Snake game with AI capabilities - now fully in terminal!
 
-## 🚀 Быстрый запуск
-
-### Установка uv (рекомендуется)
+## 🚀 Quick Start
 
 ```bash
-# Linux/macOS
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install
+uv sync
 
-# Windows (PowerShell)
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+# Play the game
+uv run pyaisnake play
+
+# Watch AI play
+uv run pyaisnake ai --visualize
+
+# View statistics
+uv run pyaisnake stats
 ```
 
-### Запуск игры
+## 📦 Installation
 
 ```bash
-# Клонируем репозиторий
+# Clone repository
 git clone https://github.com/chelslava/SnakeTkinter.git
 cd SnakeTkinter
 
-# Запуск игры (uv автоматически установит зависимости)
-uv run main.py
+# Install dependencies with uv
+uv sync
 ```
 
-### Альтернативный способ
+## 🎮 Commands
+
+### `play` - Manual Play
+
+Play Snake manually in the terminal:
 
 ```bash
-# Установка зависимостей
-uv sync --all-extras
+uv run pyaisnake play [OPTIONS]
 
-# Запуск
-uv run main.py
+Options:
+  --width, -W     Field width (default: 40)
+  --height, -H    Field height (default: 20)
+  --speed, -s     Game speed in ms (default: 100, lower = faster)
+  --obstacles, -o Number of obstacles (default: 0)
+  --ascii         Use ASCII instead of Unicode
 ```
 
-## 📦 Зависимости
+**Controls:**
+- `↑↓←→` or `WASD` - Move
+- `P` or `Space` - Pause
+- `R` - Restart
+- `Q` or `Esc` - Quit
 
-Проект использует [uv](https://docs.astral.sh/uv/) для управления зависимостями:
+### `ai` - AI Play
 
-- `numpy` - численные вычисления
-- `scikit-learn` - машинное обучение
-- `matplotlib` - визуализация (опционально)
-
-## 🎮 Возможности
-
-### 🧠 Искусственный интеллект
-
-| Алгоритм | Описание |
-|----------|----------|
-| **A\*** | Оптимальный поиск пути с кэшированием |
-| **Нейросеть** | MLPRegressor для принятия решений |
-| **Генетический** | Эволюционный алгоритм с популяцией |
-
-### 🎮 Игровые режимы
-
-1. **Классический** - стандартная игра Snake
-2. **Гонка со временем** - 2 минуты на максимальный счет
-3. **Режим выживания** - растущая сложность
-4. **Головоломка** - уровни с целями
-5. **Битва с ИИ** - соревнование с искусственным интеллектом
-6. **Спидран** - быстрое достижение целей
-7. **Бесконечный** - игра без ограничений
-
-### 📊 Аналитика и статистика
-
-- Детальная аналитика каждого хода
-- Анализ поведения игрока
-- Персонализированные рекомендации
-- Экспорт отчетов в JSON
-- Графики прогресса с matplotlib
-
-### 🎯 Достижения
-
-- Система достижений с уведомлениями
-- Различные типы достижений (счет, время, стиль игры)
-- Сохранение в SQLite базе данных
-
-## 🎮 Управление
-
-### Клавиши
-
-| Клавиша | Действие |
-|---------|----------|
-| **Стрелки** | Управление змейкой |
-| **P** | Пауза/продолжение |
-| **A** | Переключение ИИ режима |
-| **H** | Переключение подсказок |
-| **Пробел** | Перезапуск (после проигрыша) |
-
-### Кнопки интерфейса
-
-| Кнопка | Описание |
-|--------|----------|
-| 🤖 **ИИ режим** | Автоматическая игра |
-| 💡 **Подсказки** | Советы ИИ |
-| 📊 **Анализ** | Анализ сложности |
-| 🚧 **Препятствия** | Умные препятствия |
-| 📈 **Статистика** | Игровая статистика |
-| 📊 **Аналитика** | Расширенная аналитика |
-| 🎮 **Режимы** | Выбор игрового режима |
-| ⚙ **Настройки** | Настройки игры |
-
-## 🧪 Тестирование
+Let AI play the game:
 
 ```bash
-# Запуск всех тестов
+uv run pyaisnake ai [OPTIONS]
+
+Options:
+  --algorithm, -a  AI algorithm: a_star, neural, genetic, random (default: a_star)
+  --visualize, -V  Show visualization
+  --games, -g      Number of games (default: 1)
+```
+
+**Examples:**
+```bash
+# Watch A* AI play
+uv run pyaisnake ai --visualize
+
+# Run 10 AI games without visualization
+uv run pyaisnake ai --algorithm a_star --games 10
+
+# Fast AI game
+uv run pyaisnake ai --speed 20
+```
+
+### `train` - Train AI
+
+Train AI models:
+
+```bash
+uv run pyaisnake train [OPTIONS]
+
+Options:
+  --algorithm, -a  Algorithm to train: neural, genetic (required)
+  --games, -g      Training games (default: 100)
+  --save           Save model to file
+  --load           Load existing model
+```
+
+**Examples:**
+```bash
+# Train neural network
+uv run pyaisnake train --algorithm neural --games 1000 --save neural_model.pkl
+
+# Continue training
+uv run pyaisnake train --algorithm neural --load neural_model.pkl --games 500
+```
+
+### `stats` - Statistics
+
+View game statistics:
+
+```bash
+uv run pyaisnake stats [OPTIONS]
+
+Options:
+  --top, -t   Show top N scores (default: 10)
+  --export    Export stats to JSON
+```
+
+**Examples:**
+```bash
+# Show top 10 scores
+uv run pyaisnake stats
+
+# Show top 20 and export
+uv run pyaisnake stats --top 20 --export stats.json
+```
+
+## 🧠 AI Algorithms
+
+| Algorithm | Description | Best For |
+|-----------|-------------|----------|
+| **A\*** | Optimal pathfinding | High scores |
+| **Neural** | Neural network (MLPRegressor) | Learning from games |
+| **Genetic** | Evolutionary algorithm | Long-term optimization |
+| **Random** | Random safe moves | Baseline comparison |
+
+## 📁 Project Structure
+
+```
+pyaisnake/
+├── __init__.py      # Package init
+├── __main__.py      # python -m pyaisnake
+├── cli.py           # CLI entry point
+├── engine.py        # Game logic (pure Python)
+├── renderer.py      # Rich-based CLI renderer
+├── controller.py    # Keyboard input handler
+├── ai/              # AI algorithms
+│   ├── base.py      # A* pathfinding
+│   ├── neural.py    # Neural network
+│   └── genetic.py   # Genetic algorithm
+├── modes.py         # Game modes
+├── analytics.py     # Game analytics
+└── logger.py        # Logging system
+```
+
+## 🎯 Game Modes
+
+| Mode | Description |
+|------|-------------|
+| **Classic** | Standard Snake game |
+| **Time Attack** | 2 minutes to max score |
+| **Survival** | Increasing difficulty |
+| **Puzzle** | Level-based challenges |
+| **Speed Run** | Speed challenges |
+
+## ⌨️ Keyboard Support
+
+The game uses the `keyboard` library for real-time input:
+- Cross-platform (Windows, Linux, macOS)
+- No need to press Enter
+- Works in most terminals
+
+If `keyboard` is not available, the game runs in demo mode with simple AI.
+
+## 🧪 Development
+
+```bash
+# Run tests
 uv run pytest tests/ -v
 
-# Тесты с покрытием
-uv run pytest tests/ -v --cov=. --cov-report=html
+# Type checking
+uv run mypy pyaisnake/
+
+# Linting
+uv run ruff check pyaisnake/
+
+# Format
+uv run ruff format pyaisnake/
 ```
 
-## 📁 Структура проекта
+## 📊 Statistics
 
-```
-SnakeTkinter/
-├── main.py                 # Основной файл игры
-├── ai_tools.py             # Алгоритмы ИИ (A*, эвристики)
-├── neural_ai.py            # Нейронная сеть
-├── genetic_ai.py           # Генетический алгоритм
-├── advanced_analytics.py   # Расширенная аналитика
-├── game_modes.py           # Игровые режимы
-├── logger.py               # Система логирования
-├── ui_enhancements.py      # Улучшения интерфейса
-├── pyproject.toml          # Конфигурация проекта
-├── uv.lock                 # Lockfile зависимостей
-└── tests/                  # Тесты
-```
+Statistics are stored in `snake_stats.db` (SQLite):
+- Game scores
+- Duration
+- Snake length
+- Timestamps
 
-## 🔧 Технические детали
+## 🔧 Requirements
 
-### Алгоритмы ИИ
+- Python 3.10+
+- numpy
+- scikit-learn
+- rich
+- keyboard
 
-- **A* pathfinding** - оптимальный поиск пути к еде с кэшированием
-- **Нейронная сеть** - MLPRegressor (100, 50, 25) для принятия решений
-- **Генетический алгоритм** - эволюция популяции с турнирной селекцией
+## 📝 License
 
-### Аналитика
-
-- Запись каждого хода с детальной информацией
-- Анализ эффективности движений
-- Паттерны поведения игрока
-- Персонализированные рекомендации
-
-### База данных
-
-- **SQLite** для хранения статистики и достижений
-- **JSON** для экспорта аналитических отчетов
-- **Pickle** для сохранения обученных моделей
-
-## 📈 Статистика проекта
-
-- **60+ тестов** - все проходят успешно
-- **7 игровых режимов** - от классического до бесконечного
-- **17+ признаков** для нейронной сети
-- **3 алгоритма ИИ** - A*, нейросеть, генетический
+MIT License
 
 ---
 
-**Игра готова к использованию! 🎉**
+**Made with ❤️ for AI and game enthusiasts**
 
-Запустите `uv run main.py` для начала игры.
+Play now: `uv run pyaisnake play`
