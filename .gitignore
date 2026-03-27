@@ -12,13 +12,10 @@ venv/
 .vscode/
 *.swp
 
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Type checking
+# Caches
 .mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
 # Database
 *.db
@@ -29,6 +26,13 @@ htmlcov/
 # Analytics
 game_analytics.json
 
+# Logs
+logs/
+*.log
+
 # OS
 .DS_Store
 Thumbs.db
+
+# uv
+uv.lock
