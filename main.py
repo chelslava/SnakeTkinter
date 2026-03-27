@@ -6,12 +6,13 @@ from random import choice, randint
 from tkinter import messagebox
 from tkinter import ttk
 
-from ai_tools import AdvancedSnakeAI, GameAnalyzer
-from logger import game_logger, error_handler
-from ui_enhancements import ModernUI, SettingsDialog, PerformanceMonitor
-from neural_ai import NeuralSnakeAI
 from advanced_analytics import AdvancedGameAnalytics
-from game_modes import GameModeManager, GameMode
+from ai_tools import AdvancedSnakeAI, GameAnalyzer
+from game_modes import GameMode, GameModeManager
+from genetic_ai import GeneticSnakeAI
+from logger import error_handler, game_logger
+from neural_ai import NeuralSnakeAI
+from ui_enhancements import ModernUI, PerformanceMonitor, SettingsDialog
 
 # Попытка импорта matplotlib (может не быть установлен)
 try:
@@ -38,6 +39,8 @@ AI_MODE = False  # Режим автоматической игры
 AI_HELPER = False  # Режим подсказок
 DIFFICULTY_ANALYSIS = False  # Анализ сложности
 SMART_OBSTACLES = False  # Умные препятствия
+GENETIC_MODE = False  # Режим генетического ИИ
+AI_ALGORITHM = "a_star"  # Алгоритм ИИ: a_star, neural, genetic
 
 # Глобальные переменные
 last_food_times = []
@@ -58,8 +61,14 @@ neural_ai = NeuralSnakeAI()
 advanced_analytics = AdvancedGameAnalytics()
 game_mode_manager = GameModeManager()
 
+# Инициализация генетического ИИ
+genetic_ai = GeneticSnakeAI(population_size=20, genome_size=50)
+
 # Попытка загрузки обученной нейросети
 neural_ai.load_model()
+
+# Попытка загрузки обученной популяции
+genetic_ai.load_population("genetic_population.pkl")
 
 
 # --- Работа с БД ---
@@ -750,6 +759,24 @@ def toggle_smart_obstacles():
         create_obstacles()
 
 
+def toggle_ai_algorithm():
+    """Переключение алгоритма ИИ"""
+    global AI_ALGORITHM
+    algorithms = ["a_star", "neural", "genetic"]
+    current_idx = algorithms.index(AI_ALGORITHM)
+    AI_ALGORITHM = algorithms[(current_idx + 1) % len(algorithms)]
+    
+    labels = {"a_star": "A*", "neural": "🧠 Нейро", "genetic": "🧬 Генет"}
+    colors = {"a_star": "SystemButtonFace", "neural": "lightblue", "genetic": "lightgreen"}
+    
+    ai_algo_btn.config(
+        text=f"{labels[AI_ALGORITHM]}",
+        bg=colors[AI_ALGORITHM]
+    )
+    
+    game_logger.log_user_action("ai_algorithm_changed", {"algorithm": AI_ALGORITHM})
+
+
 def update_mode_button():
     """Обновляет текст кнопки режимов"""
     mode_info = game_mode_manager.get_mode_display_info()
@@ -778,6 +805,10 @@ difficulty_btn.pack(side=tk.LEFT, padx=2)
 
 obstacles_btn = tk.Button(ai_buttons_frame, text="🚧 Препятствия", command=toggle_smart_obstacles)
 obstacles_btn.pack(side=tk.LEFT, padx=2)
+
+# Кнопка переключения алгоритма ИИ
+ai_algo_btn = tk.Button(ai_buttons_frame, text="🧬 A*", command=toggle_ai_algorithm)
+ai_algo_btn.pack(side=tk.LEFT, padx=2)
 
 # Кнопка статистики в меню
 stats_btn = tk.Button(ai_buttons_frame, text="📈 Статистика", command=show_stats_window)
@@ -1400,33 +1431,47 @@ def start_countdown():
 
 # ИИ принимает решение
 def ai_decision():
-    """ИИ принимает решение с использованием нейросети и аналитики"""
+    """ИИ принимает решение с использованием различных алгоритмов"""
     global direction
     if AI_MODE and not game_over and not paused and food is not None:
         try:
             # Записываем данные для аналитики
             advanced_analytics.record_move(snake, food, obstacles, direction, score)
             
-            # Попытка использования нейросети
-            neural_decision = neural_ai.predict_best_action(snake, food, obstacles)
+            # Выбор алгоритма на основе настроек
+            if AI_ALGORITHM == "genetic":
+                # Использование генетического алгоритма
+                best_genome = genetic_ai.get_best_genome()
+                genetic_decision = genetic_ai.get_decision(best_genome, snake, food, obstacles)
+                if genetic_decision:
+                    opposites = {"Up": "Down", "Down": "Up", "Left": "Right", "Right": "Left"}
+                    if genetic_decision != opposites.get(direction, ""):
+                        direction = genetic_decision
+                        game_logger.log_ai_decision(genetic_decision, {
+                            "ai_type": "genetic",
+                            "generation": genetic_ai.generation
+                        })
+                        return
             
-            if neural_decision and neural_ai.is_trained:
-                # Используем решение нейросети
-                opposites = {"Up": "Down", "Down": "Up", "Left": "Right", "Right": "Left"}
-                if neural_decision != opposites.get(direction, ""):
-                    direction = neural_decision
-                    game_logger.log_ai_decision(neural_decision, {
-                        "ai_type": "neural_network",
-                        "snake_length": len(snake),
-                        "food_distance": math.sqrt((food[0] - snake[0][0])**2 + (food[1] - snake[0][1])**2)
-                    })
-                    
-                    # Добавляем данные для обучения нейросети
-                    reward = 1.0 if check_food_collision() else 0.1
-                    neural_ai.add_training_data(snake, food, obstacles, neural_decision, reward)
-                    return
+            elif AI_ALGORITHM == "neural":
+                # Попытка использования нейросети
+                neural_decision = neural_ai.predict_best_action(snake, food, obstacles)
+                
+                if neural_decision and neural_ai.is_trained:
+                    opposites = {"Up": "Down", "Down": "Up", "Left": "Right", "Right": "Left"}
+                    if neural_decision != opposites.get(direction, ""):
+                        direction = neural_decision
+                        game_logger.log_ai_decision(neural_decision, {
+                            "ai_type": "neural_network",
+                            "snake_length": len(snake),
+                            "food_distance": math.sqrt((food[0] - snake[0][0])**2 + (food[1] - snake[0][1])**2)
+                        })
+                        
+                        reward = 1.0 if check_food_collision() else 0.1
+                        neural_ai.add_training_data(snake, food, obstacles, neural_decision, reward)
+                        return
             
-            # Fallback к A* алгоритму
+            # Fallback к A* алгоритму (по умолчанию)
             path = ai_advanced.a_star_pathfinding(snake, food, obstacles)
             if path and len(path) > 0:
                 next_pos = path[0]
@@ -1451,7 +1496,6 @@ def ai_decision():
                         "food_distance": math.sqrt((food[0] - head[0])**2 + (food[1] - head[1])**2)
                     })
             else:
-                # Fallback к простому алгоритму
                 best_direction = ai_advanced.find_path_to_food(snake, food, obstacles)
                 opposites = {"Up": "Down", "Down": "Up", "Left": "Right", "Right": "Left"}
                 if best_direction and best_direction != opposites.get(direction, ""):
