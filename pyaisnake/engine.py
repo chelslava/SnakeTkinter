@@ -23,6 +23,68 @@ class GameState(Enum):
     WIN = "win"
 
 
+class Difficulty(Enum):
+    EASY = "easy"
+    NORMAL = "normal"
+    HARD = "hard"
+    EXTREME = "extreme"
+
+
+class PowerUpType(Enum):
+    APPLE = "apple"  # Normal food (+1 score)
+    STAR = "star"  # Speed boost for 5 seconds
+    SHIELD = "shield"  # Pass through walls once
+    DIAMOND = "diamond"  # Double points for 10 seconds
+    FREEZE = "freeze"  # Slow down game temporarily
+    MUSHROOM = "mushroom"  # Snake shrinks by 3 segments
+
+
+@dataclass
+class PowerUp:
+    """Active power-up effect"""
+
+    type: PowerUpType
+    position: tuple[int, int]
+    spawn_time: float = field(default_factory=time.time)
+
+    # Duration in seconds (0 = instant)
+    DURATIONS = {
+        PowerUpType.APPLE: 0,
+        PowerUpType.STAR: 5,
+        PowerUpType.SHIELD: 0,  # One-time use
+        PowerUpType.DIAMOND: 10,
+        PowerUpType.FREEZE: 5,
+        PowerUpType.MUSHROOM: 0,  # Instant
+    }
+
+    @property
+    def duration(self) -> float:
+        return self.DURATIONS.get(self.type, 0)
+
+    @property
+    def is_expired(self) -> bool:
+        if self.duration == 0:
+            return False
+        return time.time() - self.spawn_time > self.duration
+
+
+@dataclass
+class ActiveEffect:
+    """Currently active power-up effect on player"""
+
+    type: PowerUpType
+    start_time: float
+    duration: float
+
+    @property
+    def remaining(self) -> float:
+        return max(0, self.duration - (time.time() - self.start_time))
+
+    @property
+    def is_active(self) -> bool:
+        return self.remaining > 0
+
+
 @dataclass
 class GameConfig:
     """Game configuration"""
@@ -32,6 +94,8 @@ class GameConfig:
     initial_obstacles: int = 0
     speed_ms: int = 100
     wrap_around: bool = False
+    difficulty: Difficulty = Difficulty.NORMAL
+    power_ups_enabled: bool = True
 
 
 @dataclass
@@ -41,6 +105,7 @@ class GameStats:
     score: int = 0
     moves: int = 0
     food_eaten: int = 0
+    power_ups_collected: int = 0
     start_time: float = field(default_factory=time.time)
 
     @property
@@ -54,18 +119,38 @@ class GameStats:
         return self.food_eaten / self.moves
 
 
+# Difficulty presets
+DIFFICULTY_CONFIG = {
+    Difficulty.EASY: {
+        "speed_ms": 150,
+        "obstacles": 0,
+        "power_ups_enabled": True,
+        "power_up_frequency": 0.3,  # 30% chance
+    },
+    Difficulty.NORMAL: {
+        "speed_ms": 100,
+        "obstacles": 0,
+        "power_ups_enabled": True,
+        "power_up_frequency": 0.2,
+    },
+    Difficulty.HARD: {
+        "speed_ms": 70,
+        "obstacles": 5,
+        "power_ups_enabled": True,
+        "power_up_frequency": 0.15,
+    },
+    Difficulty.EXTREME: {
+        "speed_ms": 50,
+        "obstacles": 15,
+        "power_ups_enabled": False,
+        "power_up_frequency": 0,
+    },
+}
+
+
 class SnakeGame:
     """
     Pure game engine without GUI dependencies.
-
-    Usage:
-        game = SnakeGame()
-        game.on_food_eaten = lambda: print("Yummy!")
-
-        while game.state == GameState.RUNNING:
-            game.update()
-            print(game.render_ascii())
-            time.sleep(0.1)
     """
 
     OPPOSITE = {
@@ -75,8 +160,19 @@ class SnakeGame:
         Direction.RIGHT: Direction.LEFT,
     }
 
+    # Power-up spawn weights
+    POWER_UP_WEIGHTS = {
+        PowerUpType.APPLE: 70,  # Most common
+        PowerUpType.STAR: 8,
+        PowerUpType.SHIELD: 5,
+        PowerUpType.DIAMOND: 5,
+        PowerUpType.FREEZE: 7,
+        PowerUpType.MUSHROOM: 5,
+    }
+
     def __init__(self, config: GameConfig | None = None):
         self.config = config or GameConfig()
+        self._apply_difficulty_config()
         self.state = GameState.RUNNING
         self.stats = GameStats()
 
@@ -87,12 +183,33 @@ class SnakeGame:
         self.direction = Direction.RIGHT
         self.next_direction: Direction | None = None
 
+        # Power-ups
+        self.current_power_up: PowerUp | None = None
+        self.active_effects: list[ActiveEffect] = []
+        self.shield_count: int = 0
+        self.score_multiplier: float = 1.0
+        self.speed_modifier: float = 1.0
+
         # Callbacks
         self.on_food_eaten: Callable[[], None] | None = None
         self.on_collision: Callable[[], None] | None = None
         self.on_move: Callable[[tuple[int, int]], None] | None = None
+        self.on_power_up: Callable[[PowerUpType], None] | None = None
 
         self._init_game()
+
+    def _apply_difficulty_config(self) -> None:
+        """Apply difficulty-based configuration"""
+        diff_config = DIFFICULTY_CONFIG.get(self.config.difficulty, {})
+
+        if self.config.speed_ms == 100:  # Default, override with difficulty
+            self.config.speed_ms = diff_config.get("speed_ms", 100)
+
+        if self.config.initial_obstacles == 0:
+            self.config.initial_obstacles = diff_config.get("obstacles", 0)
+
+        self.config.power_ups_enabled = diff_config.get("power_ups_enabled", True)
+        self._power_up_frequency = diff_config.get("power_up_frequency", 0.2)
 
     def _init_game(self) -> None:
         """Initialize game state"""
@@ -106,13 +223,17 @@ class SnakeGame:
         ]
 
         self.obstacles = set()
+        self.active_effects = []
+        self.shield_count = 0
+        self.score_multiplier = 1.0
+        self.speed_modifier = 1.0
         self._spawn_food()
 
         if self.config.initial_obstacles > 0:
             self._create_obstacles(self.config.initial_obstacles)
 
     def _spawn_food(self) -> None:
-        """Spawn food at random valid position"""
+        """Spawn food or power-up at random valid position"""
         all_positions = {
             (x, y) for x in range(self.config.width) for y in range(self.config.height)
         }
@@ -120,11 +241,26 @@ class SnakeGame:
         occupied = set(self.snake) | self.obstacles
         available = list(all_positions - occupied)
 
-        if available:
-            self.food = random.choice(available)
-        else:
+        if not available:
             self.food = None
+            self.current_power_up = None
             self.state = GameState.WIN
+            return
+
+        position = random.choice(available)
+
+        # Decide if spawning power-up or regular food
+        if self.config.power_ups_enabled and random.random() < self._power_up_frequency:
+            # Choose power-up type based on weights
+            power_up_type = random.choices(
+                list(self.POWER_UP_WEIGHTS.keys()), weights=list(self.POWER_UP_WEIGHTS.values())
+            )[0]
+
+            self.current_power_up = PowerUp(type=power_up_type, position=position)
+            self.food = position
+        else:
+            self.current_power_up = PowerUp(type=PowerUpType.APPLE, position=position)
+            self.food = position
 
     def _create_obstacles(self, count: int) -> None:
         """Create random obstacles"""
@@ -146,10 +282,7 @@ class SnakeGame:
         self.obstacles = set(random.sample(available, count))
 
     def set_direction(self, direction: Direction) -> bool:
-        """
-        Set movement direction.
-        Returns False if direction is opposite to current (invalid move).
-        """
+        """Set movement direction."""
         if direction == self.OPPOSITE.get(self.direction):
             return False
 
@@ -157,12 +290,12 @@ class SnakeGame:
         return True
 
     def update(self) -> bool:
-        """
-        Update game state by one tick.
-        Returns True if game is still running, False if game over.
-        """
+        """Update game state by one tick."""
         if self.state != GameState.RUNNING:
             return False
+
+        # Update active effects
+        self._update_effects()
 
         if self.next_direction:
             self.direction = self.next_direction
@@ -179,11 +312,23 @@ class SnakeGame:
         else:  # RIGHT
             new_head = (head[0] + 1, head[1])
 
+        # Check wall collision with shield
         if not self._is_valid_position(new_head):
-            self.state = GameState.GAME_OVER
-            if self.on_collision:
-                self.on_collision()
-            return False
+            if self.shield_count > 0:
+                self.shield_count -= 1
+                # Wrap around or move anyway
+                if self.config.wrap_around:
+                    x = new_head[0] % self.config.width
+                    y = new_head[1] % self.config.height
+                    new_head = (x, y)
+                else:
+                    # Bounce back - don't move
+                    return True
+            else:
+                self.state = GameState.GAME_OVER
+                if self.on_collision:
+                    self.on_collision()
+                return False
 
         self.snake.insert(0, new_head)
         self.stats.moves += 1
@@ -192,21 +337,98 @@ class SnakeGame:
             self.on_move(new_head)
 
         if new_head == self.food:
-            self.stats.score += 1
-            self.stats.food_eaten += 1
+            self._collect_power_up()
             self._spawn_food()
-            if self.on_food_eaten:
-                self.on_food_eaten()
         else:
             self.snake.pop()
 
         return True
 
+    def _collect_power_up(self) -> None:
+        """Collect and apply power-up effect"""
+        if not self.current_power_up:
+            return
+
+        power_type = self.current_power_up.type
+        self.stats.power_ups_collected += 1
+
+        # Apply effect
+        if power_type == PowerUpType.APPLE:
+            self.stats.score += int(1 * self.score_multiplier)
+            self.stats.food_eaten += 1
+
+        elif power_type == PowerUpType.STAR:
+            self.stats.score += int(1 * self.score_multiplier)
+            self.stats.food_eaten += 1
+            self.speed_modifier = 0.5  # Speed boost (lower delay)
+            self.active_effects.append(
+                ActiveEffect(type=power_type, start_time=time.time(), duration=5.0)
+            )
+
+        elif power_type == PowerUpType.SHIELD:
+            self.stats.score += int(1 * self.score_multiplier)
+            self.stats.food_eaten += 1
+            self.shield_count += 1
+
+        elif power_type == PowerUpType.DIAMOND:
+            self.stats.score += int(1 * self.score_multiplier)
+            self.stats.food_eaten += 1
+            self.score_multiplier = 2.0
+            self.active_effects.append(
+                ActiveEffect(type=power_type, start_time=time.time(), duration=10.0)
+            )
+
+        elif power_type == PowerUpType.FREEZE:
+            self.stats.score += int(1 * self.score_multiplier)
+            self.stats.food_eaten += 1
+            self.speed_modifier = 2.0  # Slow down (higher delay)
+            self.active_effects.append(
+                ActiveEffect(type=power_type, start_time=time.time(), duration=5.0)
+            )
+
+        elif power_type == PowerUpType.MUSHROOM:
+            self.stats.score += int(1 * self.score_multiplier)
+            self.stats.food_eaten += 1
+            # Shrink snake by 3 segments (minimum length 3)
+            while len(self.snake) > 3 and len(self.snake) > len(self.snake) - 3:
+                if len(self.snake) > 3:
+                    self.snake.pop()
+
+        if self.on_food_eaten:
+            self.on_food_eaten()
+
+        if self.on_power_up:
+            self.on_power_up(power_type)
+
+    def _update_effects(self) -> None:
+        """Update active power-up effects"""
+        # Remove expired effects
+        self.active_effects = [e for e in self.active_effects if e.is_active]
+
+        # Check for active effects
+        has_star = any(e.type == PowerUpType.STAR for e in self.active_effects)
+        has_freeze = any(e.type == PowerUpType.FREEZE for e in self.active_effects)
+        has_diamond = any(e.type == PowerUpType.DIAMOND for e in self.active_effects)
+
+        self.speed_modifier = 1.0
+        self.score_multiplier = 1.0
+
+        if has_star:
+            self.speed_modifier = 0.5
+        if has_freeze:
+            self.speed_modifier = 2.0
+        if has_diamond:
+            self.score_multiplier = 2.0
+
+    @property
+    def effective_speed(self) -> int:
+        """Get effective game speed with modifiers"""
+        return int(self.config.speed_ms * self.speed_modifier)
+
     def _is_valid_position(self, pos: tuple[int, int]) -> bool:
         """Check if position is valid for movement"""
         x, y = pos
 
-        # Check boundaries
         if self.config.wrap_around:
             x = x % self.config.width
             y = y % self.config.height
@@ -216,11 +438,9 @@ class SnakeGame:
             if y < 0 or y >= self.config.height:
                 return False
 
-        # Check collision with snake body
         if pos in self.snake:
             return False
 
-        # Check collision with obstacles
         return pos not in self.obstacles
 
     def reset(self) -> None:
@@ -229,6 +449,10 @@ class SnakeGame:
         self.stats = GameStats()
         self.direction = Direction.RIGHT
         self.next_direction = None
+        self.active_effects = []
+        self.shield_count = 0
+        self.score_multiplier = 1.0
+        self.speed_modifier = 1.0
         self._init_game()
 
     def pause(self) -> None:
@@ -248,6 +472,10 @@ class SnakeGame:
             "score": self.stats.score,
             "moves": self.stats.moves,
             "state": self.state.value,
+            "power_up": self.current_power_up.type.value if self.current_power_up else None,
+            "active_effects": [e.type.value for e in self.active_effects],
+            "shield_count": self.shield_count,
+            "score_multiplier": self.score_multiplier,
         }
 
     def render_ascii(self) -> str:
@@ -260,11 +488,11 @@ class SnakeGame:
                 pos = (x, y)
 
                 if pos == self.snake[0]:
-                    char = "@"
+                    char = "@" if self.shield_count > 0 else "H"
                 elif pos in self.snake:
                     char = "o"
                 elif pos == self.food:
-                    char = "*"
+                    char = self._get_power_up_char()
                 elif pos in self.obstacles:
                     char = "#"
                 else:
@@ -274,6 +502,21 @@ class SnakeGame:
             lines.append("".join(row))
 
         return "\n".join(lines)
+
+    def _get_power_up_char(self) -> str:
+        """Get ASCII character for current power-up"""
+        if not self.current_power_up:
+            return "*"
+
+        chars = {
+            PowerUpType.APPLE: "*",
+            PowerUpType.STAR: "S",
+            PowerUpType.SHIELD: "D",
+            PowerUpType.DIAMOND: "$",
+            PowerUpType.FREEZE: "F",
+            PowerUpType.MUSHROOM: "M",
+        }
+        return chars.get(self.current_power_up.type, "*")
 
     def get_safe_directions(self) -> list[Direction]:
         """Get list of safe movement directions"""

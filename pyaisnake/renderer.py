@@ -2,70 +2,228 @@
 CLI Renderer - Rich-based terminal rendering for Snake game.
 """
 
+from enum import Enum
+
 from rich.console import Console
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 
-from .engine import Direction, GameState, SnakeGame
+from .engine import Direction, GameState, PowerUpType, SnakeGame
+
+
+class Theme(Enum):
+    DEFAULT = "default"
+    NEON = "neon"
+    RETRO = "retro"
+    MINIMAL = "minimal"
+    HACKER = "hacker"
+
+
+# Theme configurations
+THEMES = {
+    Theme.DEFAULT: {
+        "symbols": {
+            "head": "██",
+            "body": "▓▓",
+            "food": "🍎",
+            "star": "⭐",
+            "shield": "🛡️",
+            "diamond": "💎",
+            "freeze": "❄️",
+            "mushroom": "🍄",
+            "obstacle": "▒▒",
+            "empty": "  ",
+            "border_h": "══",
+            "border_v": "║",
+            "border_tl": "╔",
+            "border_tr": "╗",
+            "border_bl": "╚",
+            "border_br": "╝",
+        },
+        "colors": {
+            "head": "bold bright_green",
+            "body": "green",
+            "food": "bold bright_red",
+            "star": "bold bright_yellow",
+            "shield": "bold bright_blue",
+            "diamond": "bold bright_magenta",
+            "freeze": "bold bright_cyan",
+            "mushroom": "bold magenta",
+            "obstacle": "dim yellow",
+            "border": "bright_white",
+            "empty": "black",
+        },
+    },
+    Theme.NEON: {
+        "symbols": {
+            "head": "◈◈",
+            "body": "◇◇",
+            "food": "●●",
+            "star": "★★",
+            "shield": "◆◆",
+            "diamond": "◇◇",
+            "freeze": "❄❄",
+            "mushroom": "◎◎",
+            "obstacle": "▓▓",
+            "empty": "  ",
+            "border_h": "━━",
+            "border_v": "┃",
+            "border_tl": "┏",
+            "border_tr": "┓",
+            "border_bl": "┗",
+            "border_br": "┛",
+        },
+        "colors": {
+            "head": "bold bright_cyan",
+            "body": "cyan",
+            "food": "bold bright_magenta",
+            "star": "bold bright_yellow",
+            "shield": "bold bright_blue",
+            "diamond": "bold bright_magenta",
+            "freeze": "bold bright_cyan",
+            "mushroom": "bold magenta",
+            "obstacle": "dim yellow",
+            "border": "bright_magenta",
+            "empty": "black",
+        },
+    },
+    Theme.RETRO: {
+        "symbols": {
+            "head": "@@",
+            "body": "oo",
+            "food": "**",
+            "star": "++",
+            "shield": "##",
+            "diamond": "$$",
+            "freeze": "~~",
+            "mushroom": "&&",
+            "obstacle": "%%",
+            "empty": "  ",
+            "border_h": "--",
+            "border_v": "|",
+            "border_tl": "+",
+            "border_tr": "+",
+            "border_bl": "+",
+            "border_br": "+",
+        },
+        "colors": {
+            "head": "bold bright_green",
+            "body": "green",
+            "food": "bold bright_red",
+            "star": "bold bright_yellow",
+            "shield": "bold bright_blue",
+            "diamond": "bold bright_magenta",
+            "freeze": "bold bright_cyan",
+            "mushroom": "bold magenta",
+            "obstacle": "dim yellow",
+            "border": "bright_white",
+            "empty": "black",
+        },
+    },
+    Theme.MINIMAL: {
+        "symbols": {
+            "head": "■■",
+            "body": "□□",
+            "food": "●●",
+            "star": "◆◆",
+            "shield": "◈◈",
+            "diamond": "◇◇",
+            "freeze": "○○",
+            "mushroom": "◎◎",
+            "obstacle": "██",
+            "empty": "  ",
+            "border_h": "──",
+            "border_v": "│",
+            "border_tl": "┌",
+            "border_tr": "┐",
+            "border_bl": "└",
+            "border_br": "┘",
+        },
+        "colors": {
+            "head": "bold white",
+            "body": "dim white",
+            "food": "bold white",
+            "star": "bold white",
+            "shield": "bold white",
+            "diamond": "bold white",
+            "freeze": "bold white",
+            "mushroom": "bold white",
+            "obstacle": "dim white",
+            "border": "dim white",
+            "empty": "black",
+        },
+    },
+    Theme.HACKER: {
+        "symbols": {
+            "head": "01",
+            "body": "10",
+            "food": "00",
+            "star": "11",
+            "shield": "01",
+            "diamond": "10",
+            "freeze": "00",
+            "mushroom": "11",
+            "obstacle": "##",
+            "empty": "  ",
+            "border_h": "==",
+            "border_v": "||",
+            "border_tl": "++",
+            "border_tr": "++",
+            "border_bl": "++",
+            "border_br": "++",
+        },
+        "colors": {
+            "head": "bold bright_green",
+            "body": "green",
+            "food": "bold bright_green",
+            "star": "bold bright_green",
+            "shield": "bold bright_green",
+            "diamond": "bold bright_green",
+            "freeze": "bold bright_green",
+            "mushroom": "bold bright_green",
+            "obstacle": "dim green",
+            "border": "bright_green",
+            "empty": "black",
+        },
+    },
+}
 
 
 class CLIRenderer:
-    """
-    Rich-based CLI renderer for Snake game with smooth rendering.
-    """
+    """Rich-based CLI renderer for Snake game with smooth rendering."""
 
-    # Unicode symbols - all double-width for consistent grid
-    SYMBOLS = {
-        "head": "██",
-        "body": "▓▓",
-        "food": "🍎",
-        "obstacle": "▒▒",
-        "empty": "  ",
-        "border_h": "══",
-        "border_v": "║",
-        "border_tl": "╔",
-        "border_tr": "╗",
-        "border_bl": "╚",
-        "border_br": "╝",
-    }
-
-    # ASCII fallback
-    ASCII_SYMBOLS = {
-        "head": "@@",
-        "body": "oo",
-        "food": "**",
-        "obstacle": "##",
-        "empty": "  ",
-        "border_h": "--",
-        "border_v": "|",
-        "border_tl": "+",
-        "border_tr": "+",
-        "border_bl": "+",
-        "border_br": "+",
-    }
-
-    # Colors
-    COLORS = {
-        "head": "bold bright_green",
-        "body": "green",
-        "food": "bold bright_red on red",
-        "obstacle": "dim yellow",
-        "border": "bright_white",
-        "empty": "black",
+    POWER_UP_SYMBOLS = {
+        PowerUpType.APPLE: "food",
+        PowerUpType.STAR: "star",
+        PowerUpType.SHIELD: "shield",
+        PowerUpType.DIAMOND: "diamond",
+        PowerUpType.FREEZE: "freeze",
+        PowerUpType.MUSHROOM: "mushroom",
     }
 
     def __init__(
         self,
         game: SnakeGame,
         console: Console | None = None,
-        use_unicode: bool = True,
+        theme: Theme = Theme.DEFAULT,
     ):
         self.game = game
         self.console = console or Console()
-        self.use_unicode = use_unicode
-        self.symbols = self.SYMBOLS if use_unicode else self.ASCII_SYMBOLS
+        self.theme = theme
+        self._load_theme()
         self._live: Live | None = None
+
+    def _load_theme(self) -> None:
+        """Load theme configuration"""
+        config = THEMES.get(self.theme, THEMES[Theme.DEFAULT])
+        self.symbols = config["symbols"]
+        self.colors = config["colors"]
+
+    def set_theme(self, theme: Theme) -> None:
+        """Change theme"""
+        self.theme = theme
+        self._load_theme()
 
     def start_live(self) -> None:
         """Start live display mode for smooth rendering"""
@@ -111,6 +269,20 @@ class CLIRenderer:
         elif self.game.state == GameState.GAME_OVER:
             title += " [bold red]☠ GAME OVER[/bold red]"
 
+        # Add active effects to title
+        effects = []
+        if self.game.shield_count > 0:
+            effects.append(f"[bright_blue]🛡×{self.game.shield_count}[/bright_blue]")
+        if self.game.score_multiplier > 1:
+            effects.append(f"[bright_magenta]×{int(self.game.score_multiplier)}[/bright_magenta]")
+        if self.game.speed_modifier < 1:
+            effects.append("[bright_yellow]⚡[/bright_yellow]")
+        if self.game.speed_modifier > 1:
+            effects.append("[bright_cyan]❄[/bright_cyan]")
+
+        if effects:
+            title += " " + " ".join(effects)
+
         return Panel(
             layout,
             title=title,
@@ -124,7 +296,7 @@ class CLIRenderer:
         lines = []
         config = self.game.config
 
-        # Top border - double width characters
+        # Top border
         border = self.symbols["border_h"] * config.width
         lines.append(f"{self.symbols['border_tl']}{border}{self.symbols['border_tr']}")
 
@@ -144,8 +316,9 @@ class CLIRenderer:
                     row_parts.append(self._colorize(self.symbols["head"], "head"))
                 elif pos in snake_set:
                     row_parts.append(self._colorize(self.symbols["body"], "body"))
-                elif pos == food:
-                    row_parts.append(self._colorize(self.symbols["food"], "food"))
+                elif pos == food and self.game.current_power_up:
+                    symbol_key = self.POWER_UP_SYMBOLS.get(self.game.current_power_up.type, "food")
+                    row_parts.append(self._colorize(self.symbols[symbol_key], symbol_key))
                 elif pos in self.game.obstacles:
                     row_parts.append(self._colorize(self.symbols["obstacle"], "obstacle"))
                 else:
@@ -161,7 +334,7 @@ class CLIRenderer:
 
     def _colorize(self, text: str, style: str) -> str:
         """Apply color style to text"""
-        color = self.COLORS.get(style, "white")
+        color = self.colors.get(style, "white")
         return f"[{color}]{text}[/{color}]"
 
     def _render_stats(self) -> Panel:
@@ -181,6 +354,28 @@ class CLIRenderer:
         if stats.moves > 0:
             table.add_row("Efficiency", f"{stats.efficiency:.1%}")
 
+        # Power-ups collected
+        if stats.power_ups_collected > 0:
+            table.add_row(
+                "Power-ups", f"[bright_magenta]{stats.power_ups_collected}[/bright_magenta]"
+            )
+
+        # Active effects
+        if self.game.active_effects:
+            effect_names = []
+            for effect in self.game.active_effects:
+                if effect.type == PowerUpType.STAR:
+                    effect_names.append(f"[bright_yellow]⚡{effect.remaining:.0f}s[/bright_yellow]")
+                elif effect.type == PowerUpType.DIAMOND:
+                    effect_names.append(
+                        f"[bright_magenta]×2 {effect.remaining:.0f}s[/bright_magenta]"
+                    )
+                elif effect.type == PowerUpType.FREEZE:
+                    effect_names.append(f"[bright_cyan]❄{effect.remaining:.0f}s[/bright_cyan]")
+            if effect_names:
+                table.add_row("Effects", " ".join(effect_names))
+
+        # Direction indicator
         dir_arrows = {
             Direction.UP: "↑",
             Direction.DOWN: "↓",
@@ -190,6 +385,7 @@ class CLIRenderer:
         arrow = dir_arrows.get(self.game.direction, "?")
         table.add_row("Direction", f"[bold]{arrow}[/bold]")
 
+        # Safe moves
         safe = self.game.get_safe_directions()
         safe_colors = {0: "red", 1: "yellow", 2: "green", 3: "bright_green", 4: "bright_green"}
         safe_color = safe_colors.get(len(safe), "white")
