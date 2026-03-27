@@ -59,7 +59,7 @@ jobs:
 
     - name: Run MyPy
       run: |
-        mypy . --ignore-missing-imports || true
+        mypy . --ignore-missing-imports --explicit-package-bases || true
       continue-on-error: true
 
   release:
