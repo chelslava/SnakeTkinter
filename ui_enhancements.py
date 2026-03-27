@@ -1,7 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-import json
-import os
+from tkinter import ttk
 
 class ModernUI:
     """Современный пользовательский интерфейс"""

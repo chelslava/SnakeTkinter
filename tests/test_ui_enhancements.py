@@ -1,43 +1,43 @@
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-import sys
 sys.path.append('..')
 
-from ui_enhancements import ModernUI, SettingsDialog, PerformanceMonitor
+from ui_enhancements import ModernUI, PerformanceMonitor, SettingsDialog
 
 
 class TestPerformanceMonitor(unittest.TestCase):
     def setUp(self):
         self.monitor = PerformanceMonitor()
-    
+
     def test_initialization(self):
         """Тест инициализации монитора"""
         self.assertEqual(len(self.monitor.frame_times), 0)
         self.assertEqual(self.monitor.max_samples, 60)
-    
+
     def test_record_frame(self):
         """Тест записи времени кадра"""
         self.monitor.record_frame(0.016)
         self.assertEqual(len(self.monitor.frame_times), 1)
-    
+
     def test_record_multiple_frames(self):
         """Тест записи нескольких кадров"""
         for _ in range(10):
             self.monitor.record_frame(0.016)
         self.assertEqual(len(self.monitor.frame_times), 10)
-    
+
     def test_max_samples_limit(self):
         """Тест ограничения количества записей"""
         for _ in range(100):
             self.monitor.record_frame(0.016)
         self.assertEqual(len(self.monitor.frame_times), self.monitor.max_samples)
-    
+
     def test_get_fps_empty(self):
         """Тест получения FPS без записей"""
         fps = self.monitor.get_fps()
         self.assertEqual(fps, 0)
-    
+
     def test_get_fps_with_data(self):
         """Тест получения FPS с данными"""
         for _ in range(10):
@@ -45,12 +45,12 @@ class TestPerformanceMonitor(unittest.TestCase):
         fps = self.monitor.get_fps()
         self.assertGreater(fps, 0)
         self.assertLess(fps, 100)
-    
+
     def test_get_performance_stats_empty(self):
         """Тест получения статистики без данных"""
         stats = self.monitor.get_performance_stats()
         self.assertEqual(stats, {})
-    
+
     def test_get_performance_stats_with_data(self):
         """Тест получения статистики с данными"""
         for _ in range(10):
@@ -65,14 +65,14 @@ class TestPerformanceMonitor(unittest.TestCase):
 class TestModernUI(unittest.TestCase):
     def setUp(self):
         self.mock_root = MagicMock()
-    
+
     @patch('ui_enhancements.ttk')
     @patch('ui_enhancements.tk')
     def test_initialization(self, mock_tk, mock_ttk):
         """Тест инициализации ModernUI"""
         ui = ModernUI(self.mock_root)
         self.assertIsNotNone(ui.root)
-    
+
     @patch('ui_enhancements.ttk')
     @patch('ui_enhancements.tk')
     def test_update_status(self, mock_tk, mock_ttk):
@@ -81,7 +81,7 @@ class TestModernUI(unittest.TestCase):
         ui.status_label = MagicMock()
         ui.update_status("Test message")
         ui.status_label.config.assert_called_once_with(text="Test message")
-    
+
     @patch('ui_enhancements.ttk')
     @patch('ui_enhancements.tk')
     def test_update_fps(self, mock_tk, mock_ttk):
@@ -95,7 +95,7 @@ class TestModernUI(unittest.TestCase):
 class TestSettingsDialog(unittest.TestCase):
     def setUp(self):
         self.mock_parent = MagicMock()
-    
+
     def test_result_initialization(self):
         """Тест начального значения результата"""
         dialog = SettingsDialog.__new__(SettingsDialog)
