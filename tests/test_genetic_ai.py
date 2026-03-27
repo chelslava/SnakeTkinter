@@ -3,8 +3,6 @@ import sys
 import tempfile
 import unittest
 
-sys.path.append('..')
-
 from genetic_ai import GeneticSnakeAI, Genome
 
 
@@ -96,14 +94,10 @@ class TestGeneticSnakeAI(unittest.TestCase):
         head = self.snake[0]
 
         # Безопасное направление
-        self.assertFalse(self.ai._is_dangerous_direction(
-            head, "Right", self.snake, self.obstacles
-        ))
+        self.assertFalse(self.ai._is_dangerous_direction(head, "Right", self.snake, self.obstacles))
 
         # Опасное направление - врезается в змею
-        self.assertTrue(self.ai._is_dangerous_direction(
-            head, "Left", self.snake, self.obstacles
-        ))
+        self.assertTrue(self.ai._is_dangerous_direction(head, "Left", self.snake, self.obstacles))
 
     def test_get_decision(self):
         """Тест получения решения"""
@@ -114,11 +108,7 @@ class TestGeneticSnakeAI(unittest.TestCase):
     def test_calculate_fitness(self):
         """Тест расчета fitness"""
         fitness = self.ai.calculate_fitness(
-            score=10,
-            steps=100,
-            snake_length=13,
-            food_eaten=10,
-            time_alive=30.0
+            score=10, steps=100, snake_length=13, food_eaten=10, time_alive=30.0
         )
         self.assertGreater(fitness, 0)
 
@@ -183,5 +173,5 @@ class TestGeneticSnakeAI(unittest.TestCase):
         self.assertFalse(result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

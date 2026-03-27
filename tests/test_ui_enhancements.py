@@ -2,8 +2,6 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-sys.path.append('..')
-
 from ui_enhancements import ModernUI, PerformanceMonitor, SettingsDialog
 
 
@@ -56,25 +54,25 @@ class TestPerformanceMonitor(unittest.TestCase):
         for _ in range(10):
             self.monitor.record_frame(0.016)
         stats = self.monitor.get_performance_stats()
-        self.assertIn('fps', stats)
-        self.assertIn('avg_frame_time', stats)
-        self.assertIn('min_frame_time', stats)
-        self.assertIn('max_frame_time', stats)
+        self.assertIn("fps", stats)
+        self.assertIn("avg_frame_time", stats)
+        self.assertIn("min_frame_time", stats)
+        self.assertIn("max_frame_time", stats)
 
 
 class TestModernUI(unittest.TestCase):
     def setUp(self):
         self.mock_root = MagicMock()
 
-    @patch('ui_enhancements.ttk')
-    @patch('ui_enhancements.tk')
+    @patch("ui_enhancements.ttk")
+    @patch("ui_enhancements.tk")
     def test_initialization(self, mock_tk, mock_ttk):
         """Тест инициализации ModernUI"""
         ui = ModernUI(self.mock_root)
         self.assertIsNotNone(ui.root)
 
-    @patch('ui_enhancements.ttk')
-    @patch('ui_enhancements.tk')
+    @patch("ui_enhancements.ttk")
+    @patch("ui_enhancements.tk")
     def test_update_status(self, mock_tk, mock_ttk):
         """Тест обновления статуса"""
         ui = ModernUI(self.mock_root)
@@ -82,8 +80,8 @@ class TestModernUI(unittest.TestCase):
         ui.update_status("Test message")
         ui.status_label.config.assert_called_once_with(text="Test message")
 
-    @patch('ui_enhancements.ttk')
-    @patch('ui_enhancements.tk')
+    @patch("ui_enhancements.ttk")
+    @patch("ui_enhancements.tk")
     def test_update_fps(self, mock_tk, mock_ttk):
         """Тест обновления FPS"""
         ui = ModernUI(self.mock_root)
@@ -103,5 +101,5 @@ class TestSettingsDialog(unittest.TestCase):
         self.assertIsNone(dialog.result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
