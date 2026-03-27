@@ -47,7 +47,7 @@ DB_PATH = "snake_stats.db"
 
 # Создание главного окна
 root = tk.Tk()
-root.title("Snake AI | Счет: 0")
+root.title("PyAISnake | Счет: 0")
 root.resizable(width=False, height=False)
 
 # Инициализация улучшенного UI и мониторинга

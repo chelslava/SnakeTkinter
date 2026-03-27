@@ -1,6 +1,6 @@
 [project]
-name = "snake-tkinter"
-version = "1.0.0"
+name = "pyaisnake"
+version = "1.1.0"
 description = "Modern Snake game with AI capabilities, analytics, and multiple game modes"
 readme = "README.md"
 requires-python = ">=3.8"
