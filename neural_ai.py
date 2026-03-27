@@ -103,6 +103,7 @@ class NeuralSnakeAI:
         """Получение расстояния до ближайшего препятствия в направлении"""
         x, y = head
         cell_size = 10
+        dx, dy = 0, 0  # default values
         
         if direction == "Up":
             dx, dy = 0, -cell_size

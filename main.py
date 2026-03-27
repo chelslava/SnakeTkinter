@@ -1,9 +1,10 @@
+import math
 import sqlite3
 import time
 import tkinter as tk
-from random import randint, choice
+from random import choice, randint
 from tkinter import messagebox
-import math
+from tkinter import ttk
 
 from ai_tools import AdvancedSnakeAI, GameAnalyzer
 from logger import game_logger, error_handler
@@ -20,6 +21,8 @@ try:
 
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
+    plt = None  # type: ignore[misc,assignment]
+    FigureCanvasTkAgg = None  # type: ignore[misc,assignment]
     MATPLOTLIB_AVAILABLE = False
 
 # Настройка игры
@@ -813,22 +816,22 @@ canvas = tk.Canvas(
 canvas.pack()
 
 # Начальное состояние игры
-direction = "Right"
-food = None
-score = 0
-game_over = False
-paused = False
-obstacles = []
-ai_suggestions = []
-game_start_time = None
-achievements = set()
-last_food_times = []
-near_obstacle_streak = 0
+direction: str = "Right"
+food: tuple[int, int] | None = None
+score: int = 0
+game_over: bool = False
+paused: bool = False
+obstacles: list[tuple[int, int]] = []
+ai_suggestions: list[str] = []
+game_start_time: float | None = None
+achievements: set[str] = set()
+last_food_times: list[float] = []
+near_obstacle_streak: int = 0
 
 # Переменные для битвы с ИИ
-ai_snake = []
-ai_direction = "Left"
-ai_score = 0
+ai_snake: list[tuple[int, int]] = []
+ai_direction: str = "Left"
+ai_score: int = 0
 ai_food = None
 
 
@@ -906,6 +909,8 @@ def draw_obstacles():
 
 # Отрисовка еды
 def draw_food():
+    if food is None:
+        return
     canvas.create_rectangle(
         food[0], food[1],
         food[0] + CELL_SIZE,
@@ -1079,6 +1084,7 @@ def show_achievement(text):
 def move_snake():
     global near_obstacle_streak
     head_x, head_y = snake[0]
+    new_head: tuple[int, int] = (head_x, head_y)  # default value
 
     if direction == "Up":
         new_head = (head_x, head_y - CELL_SIZE)
@@ -1113,6 +1119,7 @@ def move_ai_snake():
     ai_decision_for_battle()
     
     head_x, head_y = ai_snake[0]
+    new_head: tuple[int, int] = (head_x, head_y)  # default value
 
     if ai_direction == "Up":
         new_head = (head_x, head_y - CELL_SIZE)
@@ -1329,11 +1336,11 @@ def draw_mode_info():
     
     # Специальная информация для режима AI_BATTLE
     if game_mode_manager.current_mode == GameMode.AI_BATTLE:
-        ai_score = mode_info.get('ai_score', 0)
+        mode_ai_score = mode_info.get('ai_score', 0)
         ai_efficiency = mode_info.get('ai_efficiency', 0.0)
         battle_time = mode_info.get('battle_time_remaining', 0)
         
-        info_text += f"\n🤖 ИИ: {ai_score} очков"
+        info_text += f"\n🤖 ИИ: {mode_ai_score} очков"
         info_text += f"\n📊 Эффективность ИИ: {ai_efficiency:.1%}"
         
         if battle_time > 0:
@@ -1395,7 +1402,7 @@ def start_countdown():
 def ai_decision():
     """ИИ принимает решение с использованием нейросети и аналитики"""
     global direction
-    if AI_MODE and not game_over and not paused:
+    if AI_MODE and not game_over and not paused and food is not None:
         try:
             # Записываем данные для аналитики
             advanced_analytics.record_move(snake, food, obstacles, direction, score)

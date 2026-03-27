@@ -21,9 +21,11 @@ class TestAdvancedSnakeAI(unittest.TestCase):
 
     def test_a_star_pathfinding(self):
         path = self.ai.a_star_pathfinding(self.snake, self.food, self.obstacles)
-        self.assertIsInstance(path, list)
-        self.assertGreater(len(path), 0)
-        self.assertEqual(path[-1], self.food)
+        self.assertIsNotNone(path)
+        if path is not None:
+            self.assertIsInstance(path, list)
+            self.assertGreater(len(path), 0)
+            self.assertEqual(path[-1], self.food)
 
     def test_predict_future_collisions(self):
         result = self.ai.predict_future_collisions(self.snake, "Right", self.obstacles)
