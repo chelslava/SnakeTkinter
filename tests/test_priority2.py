@@ -43,8 +43,9 @@ class TestNeuralSnakeAI(unittest.TestCase):
         action = self.neural_ai.predict_best_action(
             self.sample_snake, self.sample_food, self.sample_obstacles
         )
-        # Без обучения должно возвращать None
-        self.assertIsNone(action)
+        # Без обучения должен использоваться эвристический fallback
+        self.assertIsNotNone(action)
+        self.assertIn(action, ["Up", "Down", "Left", "Right"])
 
     def test_add_training_data(self):
         """Тест добавления данных для обучения"""

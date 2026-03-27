@@ -1204,6 +1204,22 @@ def move_snake():
     else:
         near_obstacle_streak = 0
 
+    # Собираем данные для обучения нейросети при ручной игре
+    if not AI_MODE and food is not None:
+        old_distance = math.sqrt((food[0] - head_x) ** 2 + (food[1] - head_y) ** 2)
+        new_distance = math.sqrt((food[0] - new_head[0]) ** 2 + (food[1] - new_head[1]) ** 2)
+
+        reward = 0.0
+        if new_distance < old_distance:
+            reward = 1.0
+        elif new_distance > old_distance:
+            reward = -0.5
+
+        if not is_valid_position(new_head):
+            reward = -10.0
+
+        neural_ai.add_training_data(snake, food, obstacles, direction, reward)
+
     snake.insert(0, new_head)
     if not check_food_collision():
         snake.pop()
