@@ -43,7 +43,7 @@ AI_ALGORITHM = "a_star"  # Алгоритм ИИ: a_star, neural, genetic
 # Глобальные переменные
 last_food_times = []
 near_obstacle_streak = 0
-DB_PATH = 'snake_stats.db'
+DB_PATH = "snake_stats.db"
 
 # Создание главного окна
 root = tk.Tk()
@@ -73,18 +73,18 @@ genetic_ai.load_population("genetic_population.pkl")
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS games (
+    c.execute("""CREATE TABLE IF NOT EXISTS games (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         score INTEGER,
         length INTEGER,
         duration REAL,
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )''')
-    c.execute('''CREATE TABLE IF NOT EXISTS achievements (
+    )""")
+    c.execute("""CREATE TABLE IF NOT EXISTS achievements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )''')
+    )""")
     conn.commit()
     conn.close()
 
@@ -93,7 +93,10 @@ def save_game_to_db(score, length, duration):
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute('INSERT INTO games (score, length, duration) VALUES (?, ?, ?)', (score, length, duration))
+        c.execute(
+            "INSERT INTO games (score, length, duration) VALUES (?, ?, ?)",
+            (score, length, duration),
+        )
         conn.commit()
         conn.close()
     except Exception as e:
@@ -104,7 +107,7 @@ def save_achievement_to_db(name):
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute('INSERT INTO achievements (name) VALUES (?)', (name,))
+        c.execute("INSERT INTO achievements (name) VALUES (?)", (name,))
         conn.commit()
         conn.close()
     except Exception as e:
@@ -115,26 +118,33 @@ def load_stats_from_db():
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute('SELECT MAX(score), AVG(score), AVG(length), AVG(duration), COUNT(*) FROM games')
+        c.execute("SELECT MAX(score), AVG(score), AVG(length), AVG(duration), COUNT(*) FROM games")
         row = c.fetchone()
         stats = {
-            'best_score': row[0] or 0,
-            'avg_score': row[1] or 0,
-            'avg_length': row[2] or 0,
-            'avg_duration': row[3] or 0,
-            'games_played': row[4] or 0
+            "best_score": row[0] or 0,
+            "avg_score": row[1] or 0,
+            "avg_length": row[2] or 0,
+            "avg_duration": row[3] or 0,
+            "games_played": row[4] or 0,
         }
-        c.execute('SELECT name, COUNT(*) FROM achievements GROUP BY name')
+        c.execute("SELECT name, COUNT(*) FROM achievements GROUP BY name")
         achs = dict(c.fetchall())
         conn.close()
         return stats, achs
     except Exception as e:
         print(f"Ошибка загрузки статистики: {e}")
-        return {'best_score': 0, 'avg_score': 0, 'avg_length': 0, 'avg_duration': 0, 'games_played': 0}, {}
+        return {
+            "best_score": 0,
+            "avg_score": 0,
+            "avg_length": 0,
+            "avg_duration": 0,
+            "games_played": 0,
+        }, {}
 
 
 # Вызвать init_db() при запуске
 init_db()
+
 
 # --- Безопасные функции с обработкой ошибок ---
 def safe_game_loop():
@@ -149,6 +159,7 @@ def safe_game_loop():
             # Попытка восстановления
             root.after(DELAY, safe_game_loop)
 
+
 def safe_ai_decision():
     """Безопасное принятие решений ИИ"""
     try:
@@ -157,6 +168,7 @@ def safe_ai_decision():
         error_handler.handle_error(e, "AI decision error", show_user=False)
         # Fallback к простому алгоритму
         simple_ai_decision()
+
 
 def simple_ai_decision():
     """Простой алгоритм ИИ как fallback"""
@@ -186,6 +198,7 @@ def simple_ai_decision():
             else:
                 direction = choice(safe_dirs)
 
+
 def get_next_position(pos, direction):
     """Получить следующую позицию при движении"""
     x, y = pos
@@ -199,6 +212,7 @@ def get_next_position(pos, direction):
         return (x + CELL_SIZE, y)
     return pos
 
+
 def is_valid_position(pos):
     """Проверка валидности позиции"""
     x, y = pos
@@ -208,6 +222,7 @@ def is_valid_position(pos):
         return False
     return pos not in obstacles
 
+
 def safe_restart_game():
     """Безопасный перезапуск игры"""
     try:
@@ -216,16 +231,15 @@ def safe_restart_game():
     except Exception as e:
         error_handler.handle_error(e, "Game restart error")
 
+
 def safe_save_game():
     """Безопасное сохранение игры"""
     try:
         game_time = time.time() - game_start_time if game_start_time else 0
         save_game_to_db(score, len(snake), game_time)
-        game_logger.log_game_event("game_saved", {
-            "score": score,
-            "length": len(snake),
-            "duration": game_time
-        })
+        game_logger.log_game_event(
+            "game_saved", {"score": score, "length": len(snake), "duration": game_time}
+        )
     except Exception as e:
         error_handler.handle_error(e, "Game save error", show_user=False)
 
@@ -242,32 +256,38 @@ def show_stats_window():
     win.geometry("500x400")
     win.resizable(False, False)
 
-    info = f"Лучший счет: {stats['best_score']}\n" \
-           f"Средний счет: {stats['avg_score']:.1f}\n" \
-           f"Средняя длина: {stats['avg_length']:.1f}\n" \
-           f"Среднее время: {stats['avg_duration']:.1f} сек\n" \
-           f"Игр сыграно: {stats['games_played']}\n"
+    info = (
+        f"Лучший счет: {stats['best_score']}\n"
+        f"Средний счет: {stats['avg_score']:.1f}\n"
+        f"Средняя длина: {stats['avg_length']:.1f}\n"
+        f"Среднее время: {stats['avg_duration']:.1f} сек\n"
+        f"Игр сыграно: {stats['games_played']}\n"
+    )
     tk.Label(win, text=info, font=("Arial", 12), justify="left").pack(anchor="w", padx=10, pady=5)
 
-    ach_text = "Достижения:\n" + ("\n".join([f"{k}: {v}" for k, v in achs.items()]) if achs else "Нет достижений")
-    tk.Label(win, text=ach_text, font=("Arial", 11), justify="left").pack(anchor="w", padx=10, pady=5)
+    ach_text = "Достижения:\n" + (
+        "\n".join([f"{k}: {v}" for k, v in achs.items()]) if achs else "Нет достижений"
+    )
+    tk.Label(win, text=ach_text, font=("Arial", 11), justify="left").pack(
+        anchor="w", padx=10, pady=5
+    )
 
     # График прогресса (если matplotlib доступен)
     if MATPLOTLIB_AVAILABLE:
         try:
             conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
-            c.execute('SELECT score FROM games ORDER BY id')
+            c.execute("SELECT score FROM games ORDER BY id")
             all_scores = [row[0] for row in c.fetchall()]
             conn.close()
 
             if len(all_scores) > 1:
                 fig = plt.Figure(figsize=(4, 2), dpi=100)
                 ax = fig.add_subplot(111)
-                ax.plot(range(1, len(all_scores) + 1), all_scores, marker='o')
-                ax.set_title('Динамика счета по играм')
-                ax.set_xlabel('Игра')
-                ax.set_ylabel('Счет')
+                ax.plot(range(1, len(all_scores) + 1), all_scores, marker="o")
+                ax.set_title("Динамика счета по играм")
+                ax.set_xlabel("Игра")
+                ax.set_ylabel("Счет")
                 fig.tight_layout()
                 canvas_plot = FigureCanvasTkAgg(fig, master=win)
                 canvas_plot.draw()
@@ -303,24 +323,24 @@ def show_settings_window():
 
         if settings_dialog.result:
             # Применяем новые настройки
-            general = settings_dialog.result['general']
-            ai_settings = settings_dialog.result['ai']
-            visual = settings_dialog.result['visual']
+            general = settings_dialog.result["general"]
+            ai_settings = settings_dialog.result["ai"]
+            visual = settings_dialog.result["visual"]
 
             # Обновляем глобальные переменные
-            WIDTH = general['width']
-            HEIGHT = general['height']
-            DELAY = general['speed']
-            INIT_OBSTACLES = general['obstacles']
+            WIDTH = general["width"]
+            HEIGHT = general["height"]
+            DELAY = general["speed"]
+            INIT_OBSTACLES = general["obstacles"]
 
             # Обновляем параметры ИИ
-            ai_advanced.learning_rate = ai_settings['learning_rate']
-            ai_advanced.exploration_rate = ai_settings['exploration_rate']
+            ai_advanced.learning_rate = ai_settings["learning_rate"]
+            ai_advanced.exploration_rate = ai_settings["exploration_rate"]
 
             # Применяем визуальные настройки
-            if visual['show_hints']:
+            if visual["show_hints"]:
                 toggle_ai_helper()
-            if visual['show_analysis']:
+            if visual["show_analysis"]:
                 toggle_difficulty_analysis()
 
             # Применяем к canvas
@@ -363,7 +383,7 @@ def show_advanced_analytics():
 
         # Создаем notebook для вкладок
         notebook = ttk.Notebook(analytics_window)
-        notebook.pack(fill='both', expand=True, padx=10, pady=10)
+        notebook.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Вкладка общей статистики
         stats_frame = ttk.Frame(notebook)
@@ -377,26 +397,30 @@ def show_advanced_analytics():
         overall_text += f"Средний счет: {stats['overall'].get('avg_score', 0):.1f}\n"
         overall_text += f"Среднее время: {stats['overall'].get('avg_duration', 0):.1f} сек\n"
 
-        tk.Label(stats_frame, text=overall_text, font=("Arial", 12), justify="left").pack(anchor="w", padx=10, pady=5)
+        tk.Label(stats_frame, text=overall_text, font=("Arial", 12), justify="left").pack(
+            anchor="w", padx=10, pady=5
+        )
 
         # Вкладка поведения игрока
         behavior_frame = ttk.Frame(notebook)
         notebook.add(behavior_frame, text="Поведение игрока")
 
-        behavior = stats.get('behavior', {})
+        behavior = stats.get("behavior", {})
         if behavior:
             behavior_text = "Предпочтения в направлениях:\n"
-            direction_prefs = behavior.get('direction_preferences', {})
+            direction_prefs = behavior.get("direction_preferences", {})
             for direction, count in direction_prefs.items():
                 behavior_text += f"  {direction}: {count}\n"
 
             behavior_text += "\nАнализ риска:\n"
-            risk_analysis = behavior.get('risk_analysis', {})
+            risk_analysis = behavior.get("risk_analysis", {})
             behavior_text += f"  Высокий риск: {risk_analysis.get('high_risk_moves', 0)}\n"
             behavior_text += f"  Низкий риск: {risk_analysis.get('low_risk_moves', 0)}\n"
             behavior_text += f"  Среднее безопасных направлений: {risk_analysis.get('avg_safe_directions', 0):.1f}\n"
 
-            tk.Label(behavior_frame, text=behavior_text, font=("Arial", 11), justify="left").pack(anchor="w", padx=10, pady=5)
+            tk.Label(behavior_frame, text=behavior_text, font=("Arial", 11), justify="left").pack(
+                anchor="w", padx=10, pady=5
+            )
 
         # Вкладка рекомендаций
         recommendations_frame = ttk.Frame(notebook)
@@ -410,7 +434,9 @@ def show_advanced_analytics():
         else:
             rec_text = "Недостаточно данных для рекомендаций"
 
-        tk.Label(recommendations_frame, text=rec_text, font=("Arial", 11), justify="left").pack(anchor="w", padx=10, pady=5)
+        tk.Label(recommendations_frame, text=rec_text, font=("Arial", 11), justify="left").pack(
+            anchor="w", padx=10, pady=5
+        )
 
         # Вкладка нейросети
         neural_frame = ttk.Frame(notebook)
@@ -421,11 +447,13 @@ def show_advanced_analytics():
         neural_text += f"Образцов для обучения: {neural_stats['training_samples']}\n"
         neural_text += f"Модель сохранена: {'Да' if neural_stats['model_file_exists'] else 'Нет'}\n"
 
-        tk.Label(neural_frame, text=neural_text, font=("Arial", 11), justify="left").pack(anchor="w", padx=10, pady=5)
+        tk.Label(neural_frame, text=neural_text, font=("Arial", 11), justify="left").pack(
+            anchor="w", padx=10, pady=5
+        )
 
         # Кнопки
         button_frame = tk.Frame(analytics_window)
-        button_frame.pack(fill='x', padx=10, pady=10)
+        button_frame.pack(fill="x", padx=10, pady=10)
 
         def export_report():
             filename = advanced_analytics.export_analytics_report()
@@ -442,9 +470,20 @@ def show_advanced_analytics():
             else:
                 messagebox.showwarning("Предупреждение", "Недостаточно данных для обучения")
 
-        tk.Button(button_frame, text="Экспорт отчета", command=export_report).pack(side='left', padx=5)
-        tk.Button(button_frame, text="Обучить нейросеть", command=train_neural).pack(side='left', padx=5)
-        tk.Button(button_frame, text="Закрыть", command=lambda: [analytics_window.destroy(), toggle_pause() if not was_paused else None]).pack(side='right', padx=5)
+        tk.Button(button_frame, text="Экспорт отчета", command=export_report).pack(
+            side="left", padx=5
+        )
+        tk.Button(button_frame, text="Обучить нейросеть", command=train_neural).pack(
+            side="left", padx=5
+        )
+        tk.Button(
+            button_frame,
+            text="Закрыть",
+            command=lambda: [
+                analytics_window.destroy(),
+                toggle_pause() if not was_paused else None,
+            ],
+        ).pack(side="right", padx=5)
 
     except Exception as e:
         error_handler.handle_error(e, "Advanced analytics error")
@@ -469,17 +508,20 @@ def show_mode_selection():
 
         # Заголовок (фиксированный)
         header_frame = tk.Frame(mode_window)
-        header_frame.pack(fill='x', padx=10, pady=10)
+        header_frame.pack(fill="x", padx=10, pady=10)
 
-        tk.Label(header_frame, text="🎮 Выбор игрового режима",
-                font=("Arial", 16, "bold")).pack()
+        tk.Label(header_frame, text="🎮 Выбор игрового режима", font=("Arial", 16, "bold")).pack()
 
-        tk.Label(header_frame, text="Выберите режим и нажмите 'Применить' для смены",
-                font=("Arial", 10), fg="gray").pack()
+        tk.Label(
+            header_frame,
+            text="Выберите режим и нажмите 'Применить' для смены",
+            font=("Arial", 10),
+            fg="gray",
+        ).pack()
 
         # Создаем основной контейнер для скроллинга
         main_container = tk.Frame(mode_window)
-        main_container.pack(fill='both', expand=True, padx=10, pady=5)
+        main_container.pack(fill="both", expand=True, padx=10, pady=5)
 
         # Создаем Canvas и Scrollbar
         canvas = tk.Canvas(main_container, bg="white", highlightthickness=0)
@@ -509,18 +551,24 @@ def show_mode_selection():
         current_config = game_mode_manager.mode_configs[current_mode]
 
         current_info = tk.Frame(content_frame, bg="lightblue", relief="groove", bd=2)
-        current_info.pack(fill='x', padx=5, pady=5)
+        current_info.pack(fill="x", padx=5, pady=5)
 
-        tk.Label(current_info, text=f"📋 Текущий режим: {current_config['name']}",
-                font=("Arial", 12, "bold"), fg="blue", bg="lightblue").pack(anchor='w', padx=10, pady=5)
+        tk.Label(
+            current_info,
+            text=f"📋 Текущий режим: {current_config['name']}",
+            font=("Arial", 12, "bold"),
+            fg="blue",
+            bg="lightblue",
+        ).pack(anchor="w", padx=10, pady=5)
 
         # Создаем список режимов
         available_modes = game_mode_manager.get_available_modes()
         mode_var = tk.StringVar(value=game_mode_manager.current_mode.value)
 
         # Заголовок для списка режимов
-        tk.Label(content_frame, text="📝 Доступные режимы:",
-                font=("Arial", 12, "bold"), bg="white").pack(anchor='w', padx=5, pady=5)
+        tk.Label(
+            content_frame, text="📝 Доступные режимы:", font=("Arial", 12, "bold"), bg="white"
+        ).pack(anchor="w", padx=5, pady=5)
 
         for mode_value in available_modes:
             mode = GameMode(mode_value)
@@ -528,11 +576,11 @@ def show_mode_selection():
 
             # Создаем фрейм для каждого режима
             mode_frame = tk.Frame(content_frame, relief="groove", bd=2, bg="white")
-            mode_frame.pack(fill='x', padx=5, pady=3)
+            mode_frame.pack(fill="x", padx=5, pady=3)
 
             # Радиокнопка с названием режима
             radio_frame = tk.Frame(mode_frame, bg="white")
-            radio_frame.pack(fill='x', padx=10, pady=5)
+            radio_frame.pack(fill="x", padx=10, pady=5)
 
             tk.Radiobutton(
                 radio_frame,
@@ -540,35 +588,46 @@ def show_mode_selection():
                 variable=mode_var,
                 value=mode_value,
                 font=("Arial", 12, "bold"),
-                bg="white"
-            ).pack(anchor='w')
+                bg="white",
+            ).pack(anchor="w")
 
             # Описание режима
             desc_frame = tk.Frame(mode_frame, bg="white")
-            desc_frame.pack(fill='x', padx=25, pady=2)
+            desc_frame.pack(fill="x", padx=25, pady=2)
 
-            tk.Label(desc_frame, text=config['description'],
-                    font=("Arial", 10), fg="gray", justify="left", bg="white").pack(anchor='w')
+            tk.Label(
+                desc_frame,
+                text=config["description"],
+                font=("Arial", 10),
+                fg="gray",
+                justify="left",
+                bg="white",
+            ).pack(anchor="w")
 
             # Детали режима
             details_frame = tk.Frame(mode_frame, bg="white")
-            details_frame.pack(fill='x', padx=25, pady=2)
+            details_frame.pack(fill="x", padx=25, pady=2)
 
             details = []
-            if config['time_limit']:
+            if config["time_limit"]:
                 details.append(f"⏱ Время: {config['time_limit']} сек")
-            if config['obstacles']:
+            if config["obstacles"]:
                 details.append("🚧 Препятствия: Да")
             else:
                 details.append("🚧 Препятствия: Нет")
-            if config['speed_increase']:
+            if config["speed_increase"]:
                 details.append("⚡ Увеличение скорости: Да")
             else:
                 details.append("⚡ Увеличение скорости: Нет")
 
             for detail in details:
-                tk.Label(details_frame, text=f"  • {detail}",
-                        font=("Arial", 9), fg="darkgreen", bg="white").pack(anchor='w')
+                tk.Label(
+                    details_frame,
+                    text=f"  • {detail}",
+                    font=("Arial", 9),
+                    fg="darkgreen",
+                    bg="white",
+                ).pack(anchor="w")
 
         # Настраиваем ширину canvas
         def on_frame_configure(event):
@@ -580,7 +639,7 @@ def show_mode_selection():
 
         # Настраиваем прокрутку мышью
         def on_mousewheel(event):
-            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
         canvas.bind_all("<MouseWheel>", on_mousewheel)
 
@@ -590,9 +649,11 @@ def show_mode_selection():
             if selected_mode != game_mode_manager.current_mode.value:
                 # Показываем сообщение о смене режима
                 selected_config = game_mode_manager.mode_configs[GameMode(selected_mode)]
-                messagebox.showinfo("Смена режима",
-                                  f"Режим изменен на: {selected_config['name']}\n\n"
-                                  f"Игра будет перезапущена с новыми настройками.")
+                messagebox.showinfo(
+                    "Смена режима",
+                    f"Режим изменен на: {selected_config['name']}\n\n"
+                    f"Игра будет перезапущена с новыми настройками.",
+                )
 
                 # Устанавливаем новый режим
                 game_mode_manager.set_mode(selected_mode)
@@ -604,10 +665,10 @@ def show_mode_selection():
                 mode_window.title(f"Режим: {selected_config['name']}")
 
                 # Логируем смену режима
-                game_logger.log_user_action("mode_changed", {
-                    "old_mode": game_mode_manager.current_mode.value,
-                    "new_mode": selected_mode
-                })
+                game_logger.log_user_action(
+                    "mode_changed",
+                    {"old_mode": game_mode_manager.current_mode.value, "new_mode": selected_mode},
+                )
             else:
                 # Если режим не изменился, просто закрываем окно
                 messagebox.showinfo("Режим", "Режим не изменился")
@@ -627,24 +688,34 @@ def show_mode_selection():
 
         # Кнопки (фиксированные внизу)
         button_frame = tk.Frame(mode_window)
-        button_frame.pack(fill='x', padx=10, pady=10)
+        button_frame.pack(fill="x", padx=10, pady=10)
 
         # Кнопка отмены
-        cancel_btn = tk.Button(button_frame, text="❌ Отмена", command=cancel,
-                             font=("Arial", 10), bg="lightcoral")
-        cancel_btn.pack(side='left', padx=5)
+        cancel_btn = tk.Button(
+            button_frame, text="❌ Отмена", command=cancel, font=("Arial", 10), bg="lightcoral"
+        )
+        cancel_btn.pack(side="left", padx=5)
 
         # Кнопка применения
-        apply_btn = tk.Button(button_frame, text="✅ Применить и перезапустить",
-                            command=apply_mode, font=("Arial", 10, "bold"), bg="lightgreen")
-        apply_btn.pack(side='right', padx=5)
+        apply_btn = tk.Button(
+            button_frame,
+            text="✅ Применить и перезапустить",
+            command=apply_mode,
+            font=("Arial", 10, "bold"),
+            bg="lightgreen",
+        )
+        apply_btn.pack(side="right", padx=5)
 
         # Подсказка
         hint_frame = tk.Frame(mode_window)
-        hint_frame.pack(fill='x', padx=10, pady=5)
+        hint_frame.pack(fill="x", padx=10, pady=5)
 
-        tk.Label(hint_frame, text="💡 Совет: Используйте колесо мыши для прокрутки списка режимов",
-                font=("Arial", 9), fg="blue").pack()
+        tk.Label(
+            hint_frame,
+            text="💡 Совет: Используйте колесо мыши для прокрутки списка режимов",
+            font=("Arial", 9),
+            fg="blue",
+        ).pack()
 
         # Обработчик закрытия окна
         def on_closing():
@@ -668,7 +739,16 @@ game_analyzer = GameAnalyzer()
 
 # --- ФУНКЦИИ УПРАВЛЕНИЯ ---
 def restart_game():
-    global snake, direction, food, score, game_over, paused, obstacles, ai_suggestions, game_start_time
+    global \
+        snake, \
+        direction, \
+        food, \
+        score, \
+        game_over, \
+        paused, \
+        obstacles, \
+        ai_suggestions, \
+        game_start_time
     global ai_snake, ai_direction, ai_score  # Добавляем переменные ИИ
 
     # Начальное положение змейки
@@ -709,7 +789,7 @@ def toggle_pause():
     paused = not paused
     pause_btn.config(
         text="▶ Продолжить" if paused else "⏸ Пауза",
-        bg="lightgray" if paused else "SystemButtonFace"
+        bg="lightgray" if paused else "SystemButtonFace",
     )
     if not paused:
         game_loop()
@@ -720,7 +800,7 @@ def toggle_ai_mode():
     AI_MODE = not AI_MODE
     ai_mode_btn.config(
         text="🤖 ИИ режим ВКЛ" if AI_MODE else "🤖 ИИ режим",
-        bg="lightgreen" if AI_MODE else "SystemButtonFace"
+        bg="lightgreen" if AI_MODE else "SystemButtonFace",
     )
     if AI_MODE:
         messagebox.showinfo("ИИ режим", "ИИ будет играть автоматически!")
@@ -731,7 +811,7 @@ def toggle_ai_helper():
     AI_HELPER = not AI_HELPER
     ai_helper_btn.config(
         text="💡 Подсказки ВКЛ" if AI_HELPER else "💡 Подсказки",
-        bg="lightblue" if AI_HELPER else "SystemButtonFace"
+        bg="lightblue" if AI_HELPER else "SystemButtonFace",
     )
 
 
@@ -740,7 +820,7 @@ def toggle_difficulty_analysis():
     DIFFICULTY_ANALYSIS = not DIFFICULTY_ANALYSIS
     difficulty_btn.config(
         text="📊 Анализ ВКЛ" if DIFFICULTY_ANALYSIS else "📊 Анализ",
-        bg="lightyellow" if DIFFICULTY_ANALYSIS else "SystemButtonFace"
+        bg="lightyellow" if DIFFICULTY_ANALYSIS else "SystemButtonFace",
     )
 
 
@@ -749,7 +829,7 @@ def toggle_smart_obstacles():
     SMART_OBSTACLES = not SMART_OBSTACLES
     obstacles_btn.config(
         text="🚧 Препятствия ВКЛ" if SMART_OBSTACLES else "🚧 Препятствия",
-        bg="lightcoral" if SMART_OBSTACLES else "SystemButtonFace"
+        bg="lightcoral" if SMART_OBSTACLES else "SystemButtonFace",
     )
     if SMART_OBSTACLES:
         create_obstacles()
@@ -765,10 +845,7 @@ def toggle_ai_algorithm():
     labels = {"a_star": "A*", "neural": "🧠 Нейро", "genetic": "🧬 Генет"}
     colors = {"a_star": "SystemButtonFace", "neural": "lightblue", "genetic": "lightgreen"}
 
-    ai_algo_btn.config(
-        text=f"{labels[AI_ALGORITHM]}",
-        bg=colors[AI_ALGORITHM]
-    )
+    ai_algo_btn.config(text=f"{labels[AI_ALGORITHM]}", bg=colors[AI_ALGORITHM])
 
     game_logger.log_user_action("ai_algorithm_changed", {"algorithm": AI_ALGORITHM})
 
@@ -776,10 +853,7 @@ def toggle_ai_algorithm():
 def update_mode_button():
     """Обновляет текст кнопки режимов"""
     mode_info = game_mode_manager.get_mode_display_info()
-    mode_btn.config(
-        text=f"🎮 {mode_info['name']}",
-        bg="lightblue"
-    )
+    mode_btn.config(text=f"🎮 {mode_info['name']}", bg="lightblue")
 
 
 # Создаем меню
@@ -833,13 +907,7 @@ pause_btn = tk.Button(game_buttons_frame, text="⏸ Пауза", command=toggle_
 pause_btn.pack(side=tk.RIGHT, padx=2)
 
 # Игровое поле
-canvas = tk.Canvas(
-    root,
-    width=WIDTH,
-    height=HEIGHT,
-    bg="black",
-    highlightthickness=0
-)
+canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg="black", highlightthickness=0)
 canvas.pack()
 
 # Начальное состояние игры
@@ -852,8 +920,6 @@ obstacles: list[tuple[int, int]] = []
 ai_suggestions: list[str] = []
 game_start_time: float | None = None
 achievements: set[str] = set()
-last_food_times: list[float] = []
-near_obstacle_streak: int = 0
 
 # Переменные для битвы с ИИ
 ai_snake: list[tuple[int, int]] = []
@@ -926,11 +992,12 @@ def create_obstacles():
 def draw_obstacles():
     for obstacle in obstacles:
         canvas.create_rectangle(
-            obstacle[0], obstacle[1],
+            obstacle[0],
+            obstacle[1],
             obstacle[0] + CELL_SIZE,
             obstacle[1] + CELL_SIZE,
             fill="red",
-            outline="darkred"
+            outline="darkred",
         )
 
 
@@ -939,10 +1006,7 @@ def draw_food():
     if food is None:
         return
     canvas.create_rectangle(
-        food[0], food[1],
-        food[0] + CELL_SIZE,
-        food[1] + CELL_SIZE,
-        fill="orange"
+        food[0], food[1], food[0] + CELL_SIZE, food[1] + CELL_SIZE, fill="orange"
     )
 
 
@@ -950,11 +1014,12 @@ def draw_food():
 def draw_snake():
     for index, segment in enumerate(snake):
         canvas.create_rectangle(
-            segment[0], segment[1],
+            segment[0],
+            segment[1],
             segment[0] + CELL_SIZE,
             segment[1] + CELL_SIZE,
             fill="lime" if index == 0 else "green",
-            outline="darkgreen"
+            outline="darkgreen",
         )
 
 
@@ -962,11 +1027,12 @@ def draw_ai_snake():
     """Отрисовка змейки ИИ"""
     for index, segment in enumerate(ai_snake):
         canvas.create_rectangle(
-            segment[0], segment[1],
+            segment[0],
+            segment[1],
             segment[0] + CELL_SIZE,
             segment[1] + CELL_SIZE,
             fill="red" if index == 0 else "darkred",
-            outline="maroon"
+            outline="maroon",
         )
 
 
@@ -976,11 +1042,7 @@ def draw_ai_suggestions():
         y_offset = 20
         for suggestion in ai_suggestions[:3]:
             canvas.create_text(
-                10, y_offset,
-                text=suggestion,
-                fill="yellow",
-                font=("Arial", 10),
-                anchor="nw"
+                10, y_offset, text=suggestion, fill="yellow", font=("Arial", 10), anchor="nw"
             )
             y_offset += 20
 
@@ -988,22 +1050,22 @@ def draw_ai_suggestions():
 def draw_ai_battle_events():
     """Отрисовка событий битвы с ИИ"""
     if game_mode_manager.current_mode == GameMode.AI_BATTLE:
-        special_events = game_mode_manager.mode_state.get('special_events', [])
+        special_events = game_mode_manager.mode_state.get("special_events", [])
         current_time = time.time()
 
         # Показываем последние 3 события
-        recent_events = [event for event in special_events
-                        if current_time - event['timestamp'] < 3]
+        recent_events = [event for event in special_events if current_time - event["timestamp"] < 3]
 
         y_offset = 80
         for event in recent_events[-3:]:
-            color = "orange" if event['type'] == 'ai_score' else "yellow"
+            color = "orange" if event["type"] == "ai_score" else "yellow"
             canvas.create_text(
-                10, y_offset,
-                text=event['message'],
+                10,
+                y_offset,
+                text=event["message"],
                 fill=color,
                 font=("Arial", 10, "bold"),
-                anchor="nw"
+                anchor="nw",
             )
             y_offset += 20
 
@@ -1015,11 +1077,12 @@ def draw_difficulty_analysis():
         color = "green" if difficulty < 30 else "yellow" if difficulty < 60 else "red"
 
         canvas.create_text(
-            WIDTH - 10, 20,
+            WIDTH - 10,
+            20,
             text=f"Сложность: {difficulty:.0f}%",
             fill=color,
             font=("Arial", 12, "bold"),
-            anchor="ne"
+            anchor="ne",
         )
 
 
@@ -1034,16 +1097,16 @@ def on_key_press(event):
         if key in opposites and direction != opposites[key]:
             direction = key
     # Перезапуск игры
-    elif key == 'space' and game_over:
+    elif key == "space" and game_over:
         restart_game()
     # Пауза
-    elif key == 'p':
+    elif key == "p":
         toggle_pause()
     # Переключение ИИ режима
-    elif key == 'a':
+    elif key == "a":
         toggle_ai_mode()
     # Переключение подсказок
-    elif key == 'h':
+    elif key == "h":
         toggle_ai_helper()
 
 
@@ -1075,7 +1138,11 @@ def check_achievements():
         achievements.add("eat10")
         show_achievement("Съедено 10! 🏅")
     # Пример: "Выживи 2 минуты"
-    if game_start_time and time.time() - game_start_time >= 120 and "survive2min" not in achievements:
+    if (
+        game_start_time
+        and time.time() - game_start_time >= 120
+        and "survive2min" not in achievements
+    ):
         achievements.add("survive2min")
         show_achievement("Выжил 2 минуты! 🏅")
     # Пример: "Обогни 5 препятствий подряд"
@@ -1083,7 +1150,11 @@ def check_achievements():
         achievements.add("dodge5")
         show_achievement("Обогнул 5 препятствий подряд! 🏅")
     # Пример: "Съешь 3 еды за 10 секунд"
-    if len(last_food_times) >= 3 and last_food_times[-1] - last_food_times[-3] <= 10 and "fast3" not in achievements:
+    if (
+        len(last_food_times) >= 3
+        and last_food_times[-1] - last_food_times[-3] <= 10
+        and "fast3" not in achievements
+    ):
         achievements.add("fast3")
         show_achievement("3 еды за 10 секунд! 🏅")
     # Пример: "Счет 20"
@@ -1233,10 +1304,7 @@ def check_ai_food_collision():
 # Проверка на столкновение со стенами
 def check_wall_collision():
     head_x, head_y = snake[0]
-    return (
-        head_x < 0 or head_x >= WIDTH or
-        head_y < 0 or head_y >= HEIGHT
-    )
+    return head_x < 0 or head_x >= WIDTH or head_y < 0 or head_y >= HEIGHT
 
 
 # Проверка самостолкновения
@@ -1257,19 +1325,21 @@ def end_game():
 
     try:
         canvas.create_text(
-        WIDTH // 2, HEIGHT // 2,
-        text=f"Игра окончена! Счёт: {score}",
-        fill="white",
-        font=("Arial", 14)
+            WIDTH // 2,
+            HEIGHT // 2,
+            text=f"Игра окончена! Счёт: {score}",
+            fill="white",
+            font=("Arial", 14),
         )
 
         # Показываем статистику ИИ
         if AI_MODE or AI_HELPER:
             canvas.create_text(
-                WIDTH // 2, HEIGHT // 2 + 30,
+                WIDTH // 2,
+                HEIGHT // 2 + 30,
                 text="ИИ помогал в игре! 🤖",
                 fill="cyan",
-                font=("Arial", 12)
+                font=("Arial", 12),
             )
 
         # Записываем данные в расширенную аналитику
@@ -1280,14 +1350,17 @@ def end_game():
         safe_save_game()
 
         # Логируем завершение игры
-        game_logger.log_game_event("game_ended", {
-            "score": score,
-            "length": len(snake),
-            "duration": game_time,
-            "ai_mode": AI_MODE,
-            "ai_helper": AI_HELPER,
-            "game_mode": game_mode_manager.current_mode.value
-        })
+        game_logger.log_game_event(
+            "game_ended",
+            {
+                "score": score,
+                "length": len(snake),
+                "duration": game_time,
+                "ai_mode": AI_MODE,
+                "ai_helper": AI_HELPER,
+                "game_mode": game_mode_manager.current_mode.value,
+            },
+        )
 
         # Сброс счетчика ошибок при успешном завершении
         error_handler.reset_error_count()
@@ -1308,19 +1381,21 @@ def end_game_with_message(message):
     try:
         # Показываем основное сообщение
         canvas.create_text(
-            WIDTH // 2, HEIGHT // 2,
+            WIDTH // 2,
+            HEIGHT // 2,
             text=message or f"Игра окончена! Счёт: {score}",
             fill="white",
-            font=("Arial", 14)
+            font=("Arial", 14),
         )
 
         # Показываем результат битвы с ИИ
         if game_mode_manager.current_mode == GameMode.AI_BATTLE:
             canvas.create_text(
-                WIDTH // 2, HEIGHT // 2 + 40,
+                WIDTH // 2,
+                HEIGHT // 2 + 40,
                 text=f"🎮 Игрок: {score} | 🤖 ИИ: {ai_score}",
                 fill="cyan",
-                font=("Arial", 12)
+                font=("Arial", 12),
             )
 
         # Записываем данные в расширенную аналитику
@@ -1328,15 +1403,19 @@ def end_game_with_message(message):
         advanced_analytics.record_game_end(score, game_time, AI_MODE)
 
         # Логируем завершение игры
-        game_logger.log_game_event("game_ended_with_message", {
-            "score": score,
-            "message": message,
-            "mode": game_mode_manager.current_mode.value,
-            "ai_score": ai_score if game_mode_manager.current_mode == GameMode.AI_BATTLE else 0
-        })
+        game_logger.log_game_event(
+            "game_ended_with_message",
+            {
+                "score": score,
+                "message": message,
+                "mode": game_mode_manager.current_mode.value,
+                "ai_score": ai_score if game_mode_manager.current_mode == GameMode.AI_BATTLE else 0,
+            },
+        )
 
     except Exception as e:
         error_handler.handle_error(e, "Game end with message error")
+
 
 def draw_mode_info():
     """Отрисовка информации о режиме"""
@@ -1345,25 +1424,25 @@ def draw_mode_info():
     # Отображаем информацию о режиме в правом верхнем углу
     info_text = f"🎮 {mode_info['name']}"
 
-    if mode_info['time_remaining']:
-        minutes = int(mode_info['time_remaining'] // 60)
-        seconds = int(mode_info['time_remaining'] % 60)
+    if mode_info["time_remaining"]:
+        minutes = int(mode_info["time_remaining"] // 60)
+        seconds = int(mode_info["time_remaining"] % 60)
         info_text += f"\n⏱ {minutes:02d}:{seconds:02d}"
 
-    if mode_info['difficulty_level'] > 1:
+    if mode_info["difficulty_level"] > 1:
         info_text += f"\n📈 Уровень: {mode_info['difficulty_level']}"
 
-    if mode_info['speed_multiplier'] > 1.0:
+    if mode_info["speed_multiplier"] > 1.0:
         info_text += f"\n⚡ Скорость: x{mode_info['speed_multiplier']:.1f}"
 
-    if mode_info['score_multiplier'] > 1.0:
+    if mode_info["score_multiplier"] > 1.0:
         info_text += f"\n🏆 Множитель: x{mode_info['score_multiplier']:.1f}"
 
     # Специальная информация для режима AI_BATTLE
     if game_mode_manager.current_mode == GameMode.AI_BATTLE:
-        mode_ai_score = mode_info.get('ai_score', 0)
-        ai_efficiency = mode_info.get('ai_efficiency', 0.0)
-        battle_time = mode_info.get('battle_time_remaining', 0)
+        mode_ai_score = mode_info.get("ai_score", 0)
+        ai_efficiency = mode_info.get("ai_efficiency", 0.0)
+        battle_time = mode_info.get("battle_time_remaining", 0)
 
         info_text += f"\n🤖 ИИ: {mode_ai_score} очков"
         info_text += f"\n📊 Эффективность ИИ: {ai_efficiency:.1%}"
@@ -1378,11 +1457,7 @@ def draw_mode_info():
         info_text += f"\n🎮 Игрок: {score} | 🤖 ИИ: {ai_score}"
 
     canvas.create_text(
-        WIDTH - 10, 50,
-        text=info_text,
-        fill="cyan",
-        font=("Arial", 10, "bold"),
-        anchor="ne"
+        WIDTH - 10, 50, text=info_text, fill="cyan", font=("Arial", 10, "bold"), anchor="ne"
     )
 
 
@@ -1409,11 +1484,12 @@ def start_countdown():
         if index < len(countdown_numbers):
             canvas.create_rectangle(0, 0, WIDTH, HEIGHT, fill="#000", tags="countdown")
             canvas.create_text(
-                WIDTH // 2, HEIGHT // 2,
+                WIDTH // 2,
+                HEIGHT // 2,
                 text=countdown_numbers[index],
                 fill="white",
                 font=("Arial", 32, "bold"),
-                tags="countdown"
+                tags="countdown",
             )
             root.after(1000, show_next, index + 1)
         else:
@@ -1441,10 +1517,10 @@ def ai_decision():
                     opposites = {"Up": "Down", "Down": "Up", "Left": "Right", "Right": "Left"}
                     if genetic_decision != opposites.get(direction, ""):
                         direction = genetic_decision
-                        game_logger.log_ai_decision(genetic_decision, {
-                            "ai_type": "genetic",
-                            "generation": genetic_ai.generation
-                        })
+                        game_logger.log_ai_decision(
+                            genetic_decision,
+                            {"ai_type": "genetic", "generation": genetic_ai.generation},
+                        )
                         return
 
             elif AI_ALGORITHM == "neural":
@@ -1455,11 +1531,16 @@ def ai_decision():
                     opposites = {"Up": "Down", "Down": "Up", "Left": "Right", "Right": "Left"}
                     if neural_decision != opposites.get(direction, ""):
                         direction = neural_decision
-                        game_logger.log_ai_decision(neural_decision, {
-                            "ai_type": "neural_network",
-                            "snake_length": len(snake),
-                            "food_distance": math.sqrt((food[0] - snake[0][0])**2 + (food[1] - snake[0][1])**2)
-                        })
+                        game_logger.log_ai_decision(
+                            neural_decision,
+                            {
+                                "ai_type": "neural_network",
+                                "snake_length": len(snake),
+                                "food_distance": math.sqrt(
+                                    (food[0] - snake[0][0]) ** 2 + (food[1] - snake[0][1]) ** 2
+                                ),
+                            },
+                        )
 
                         reward = 1.0 if check_food_collision() else 0.1
                         neural_ai.add_training_data(snake, food, obstacles, neural_decision, reward)
@@ -1484,17 +1565,24 @@ def ai_decision():
                 opposites = {"Up": "Down", "Down": "Up", "Left": "Right", "Right": "Left"}
                 if best_direction != opposites.get(direction, ""):
                     direction = best_direction
-                    game_logger.log_ai_decision(best_direction, {
-                        "ai_type": "a_star",
-                        "snake_length": len(snake),
-                        "food_distance": math.sqrt((food[0] - head[0])**2 + (food[1] - head[1])**2)
-                    })
+                    game_logger.log_ai_decision(
+                        best_direction,
+                        {
+                            "ai_type": "a_star",
+                            "snake_length": len(snake),
+                            "food_distance": math.sqrt(
+                                (food[0] - head[0]) ** 2 + (food[1] - head[1]) ** 2
+                            ),
+                        },
+                    )
             else:
                 best_direction = ai_advanced.find_path_to_food(snake, food, obstacles)
                 opposites = {"Up": "Down", "Down": "Up", "Left": "Right", "Right": "Left"}
                 if best_direction and best_direction != opposites.get(direction, ""):
                     direction = best_direction
-                    game_logger.log_ai_decision(best_direction, {"ai_type": "simple", "fallback": True})
+                    game_logger.log_ai_decision(
+                        best_direction, {"ai_type": "simple", "fallback": True}
+                    )
 
         except Exception as e:
             error_handler.handle_error(e, "AI decision error", show_user=False)
@@ -1517,11 +1605,12 @@ def game_loop():
         if not game_over:
             # Показываем сообщение о паузе
             canvas.create_text(
-                WIDTH // 2, HEIGHT // 2,
+                WIDTH // 2,
+                HEIGHT // 2,
                 text="ПАУЗА\nНажмите 'P' для продолжения",
                 fill="white",
                 font=("Arial", 16),
-                justify="center"
+                justify="center",
             )
         return
 
@@ -1531,17 +1620,17 @@ def game_loop():
 
         # Обновляем состояние игрового режима
         game_state = {
-            'score': score,
-            'snake_length': len(snake),
-            'obstacles_count': len(obstacles),
-            'ai_mode': AI_MODE
+            "score": score,
+            "snake_length": len(snake),
+            "obstacles_count": len(obstacles),
+            "ai_mode": AI_MODE,
         }
         game_mode_manager.update_mode_state(game_state)
 
         # Проверяем условия режима
         mode_conditions = game_mode_manager.check_mode_conditions(game_state)
-        if mode_conditions['game_over']:
-            end_game_with_message(mode_conditions['special_message'])
+        if mode_conditions["game_over"]:
+            end_game_with_message(mode_conditions["special_message"])
             return
 
         # ИИ принимает решение
@@ -1558,13 +1647,13 @@ def game_loop():
 
         # Адаптивная сложность на основе режима
         mode_config = game_mode_manager.get_mode_config()
-        if mode_config['speed_increase']:
-            speed_multiplier = game_mode_manager.mode_state['speed_multiplier']
+        if mode_config["speed_increase"]:
+            speed_multiplier = game_mode_manager.mode_state["speed_multiplier"]
             DELAY = max(30, int(100 / speed_multiplier))
 
         # Обновление препятствий для режимов с препятствиями
-        if mode_config['obstacles']:
-            obstacle_count = game_mode_manager.mode_state['obstacle_count']
+        if mode_config["obstacles"]:
+            obstacle_count = game_mode_manager.mode_state["obstacle_count"]
             if len(obstacles) != obstacle_count:
                 create_obstacles()
 
@@ -1594,7 +1683,7 @@ def game_loop():
         # Расширенная информация в статусе
         mode_info = game_mode_manager.get_mode_display_info()
         status_text = f"Счет: {score} | Длина: {len(snake)} | FPS: {fps:.1f}"
-        if mode_info['time_remaining']:
+        if mode_info["time_remaining"]:
             status_text += f" | Время: {mode_info['time_remaining']:.0f}s"
         modern_ui.update_status(status_text)
 
