@@ -214,7 +214,7 @@ def cmd_play(args: argparse.Namespace) -> int:
 
 
 def _play_keyboard(game: SnakeGame, renderer: CLIRenderer, speed: int) -> int:
-    """Play with keyboard library"""
+    """Play with keyboard library using Live display"""
     import keyboard
 
     running = True
@@ -240,22 +240,29 @@ def _play_keyboard(game: SnakeGame, renderer: CLIRenderer, speed: int) -> int:
     keyboard.read_event()  # Wait for first key
 
     try:
+        # Start live display for smooth rendering
+        renderer.start_live()
+
         while running:
             if game.state == GameState.RUNNING:
                 game.update()
-
-            renderer.render()
-
-            if game.state == GameState.GAME_OVER:
-                key = keyboard.read_event(timeout=None)
-                if key.name == "r":
-                    game.reset()
-                elif key.name in ("q", "esc"):
-                    break
-            else:
+                renderer.update()
                 time.sleep(speed / 1000)
+            elif game.state == GameState.PAUSED:
+                renderer.update()
+                time.sleep(0.1)  # Slower update when paused
+            elif game.state == GameState.GAME_OVER:
+                renderer.update()
+                # Wait for key press
+                key = keyboard.read_event(timeout=None)
+                if key and key.event_type == keyboard.KEY_DOWN:
+                    if key.name == "r":
+                        game.reset()
+                    elif key.name in ("q", "esc"):
+                        break
 
     finally:
+        renderer.stop_live()
         keyboard.unhook_all()
 
     console.print(f"\n[cyan]Final score:[/cyan] [bold]{game.stats.score}[/bold]")
@@ -263,7 +270,7 @@ def _play_keyboard(game: SnakeGame, renderer: CLIRenderer, speed: int) -> int:
 
 
 def _play_fallback(game: SnakeGame, renderer: CLIRenderer, speed: int) -> int:
-    """Play with fallback input (limited)"""
+    """Play with fallback input using Live display"""
     console.print("[yellow]Note: keyboard library not available.[/yellow]")
     console.print("[yellow]Using demo mode - AI will play.[/yellow]")
     console.print("[dim]Press Ctrl+C to quit[/dim]\n")
@@ -271,6 +278,8 @@ def _play_fallback(game: SnakeGame, renderer: CLIRenderer, speed: int) -> int:
     time.sleep(1)
 
     try:
+        renderer.start_live()
+
         while True:
             if game.state == GameState.RUNNING:
                 # Simple random AI for demo
@@ -280,17 +289,17 @@ def _play_fallback(game: SnakeGame, renderer: CLIRenderer, speed: int) -> int:
 
                     game.set_direction(random.choice(safe))
                 game.update()
-
-            renderer.render()
-
-            if game.state == GameState.GAME_OVER:
+                renderer.update()
+                time.sleep(speed / 1000)
+            elif game.state == GameState.GAME_OVER:
+                renderer.update()
                 time.sleep(2)
                 game.reset()
-            else:
-                time.sleep(speed / 1000)
 
     except KeyboardInterrupt:
         pass
+    finally:
+        renderer.stop_live()
 
     console.print(f"\n[cyan]Final score:[/cyan] [bold]{game.stats.score}[/bold]")
     return 0
@@ -312,18 +321,26 @@ def cmd_ai(args: argparse.Namespace) -> int:
 
         ai = _create_ai(args.algorithm, game)
 
-        moves = 0
-        while game.state == GameState.RUNNING:
-            direction = ai.get_direction()
-            if direction:
-                game.set_direction(direction)
+        if renderer and args.visualize:
+            renderer.start_live()
 
-            if game.update():
-                moves += 1
+        try:
+            moves = 0
+            while game.state == GameState.RUNNING:
+                direction = ai.get_direction()
+                if direction:
+                    game.set_direction(direction)
 
+                if game.update():
+                    moves += 1
+
+                if renderer:
+                    renderer.update()
+                    time.sleep(args.speed / 1000)
+
+        finally:
             if renderer:
-                renderer.render()
-                time.sleep(args.speed / 1000)
+                renderer.stop_live()
 
         results.append(
             {
