@@ -1,4 +1,5 @@
 @echo off
-echo Запуск Snake AI с виртуальным окружением...
-.venv\Scripts\python.exe main.py
-pause 
+chcp 65001 >nul
+echo Запуск PyAISnake...
+uv run main.py
+pause
