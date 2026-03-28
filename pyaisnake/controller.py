@@ -129,23 +129,22 @@ class CLIController:
         """Start keyboard library listener"""
         # keyboard library hooks globally, no thread needed
         # Just ensure all bindings are registered
+        import contextlib
+
         for key, callback in self._callbacks.items():
-            try:
+            with contextlib.suppress(Exception):
                 keyboard.add_hotkey(key, callback)
-            except Exception:
-                pass  # Key might already be bound
 
     def _start_fallback_thread(self) -> None:
         """Start fallback input thread (limited functionality)"""
+        import contextlib
 
         def fallback_listener():
             while self.running:
-                try:
+                with contextlib.suppress(Exception):
                     # This is blocking and limited
                     # For real games, use keyboard library
                     time.sleep(0.05)
-                except Exception:
-                    pass
 
         self._thread = threading.Thread(target=fallback_listener, daemon=True)
         self._thread.start()

@@ -34,7 +34,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y python3-tk
 
     - name: Run tests
-      run: uv run pytest tests/ -v --tb=short
+      run: uv run pytest pyaisnake/tests/ -v --tb=short
 
     - name: Upload coverage
       uses: codecov/codecov-action@v3
