@@ -23,7 +23,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from . import __version__
-from .engine import Difficulty, Direction, GameConfig, GameState, SnakeGame
+from .engine import Difficulty, Direction, GameConfig, GameMode, GameState, SnakeGame
 from .renderer import CLIRenderer, Theme
 
 try:
@@ -102,6 +102,13 @@ def create_parser() -> argparse.ArgumentParser:
         "--no-power-ups",
         action="store_true",
         help="Disable power-ups",
+    )
+    play_parser.add_argument(
+        "--mode",
+        "-m",
+        choices=["classic", "time_attack", "survival", "puzzle"],
+        default="classic",
+        help="Game mode (default: classic)",
     )
 
     # AI command
@@ -251,10 +258,21 @@ def _get_theme(value: str) -> Theme:
     }.get(value, Theme.DEFAULT)
 
 
+def _get_game_mode(value: str) -> GameMode:
+    """Convert string to GameMode enum"""
+    return {
+        "classic": GameMode.CLASSIC,
+        "time_attack": GameMode.TIME_ATTACK,
+        "survival": GameMode.SURVIVAL,
+        "puzzle": GameMode.PUZZLE,
+    }.get(value, GameMode.CLASSIC)
+
+
 def cmd_play(args: argparse.Namespace) -> int:
     """Run interactive play mode"""
     difficulty = _get_difficulty(args.difficulty)
     theme = _get_theme(args.theme)
+    game_mode = _get_game_mode(args.mode)
 
     config = GameConfig(
         width=args.width,
@@ -263,6 +281,7 @@ def cmd_play(args: argparse.Namespace) -> int:
         initial_obstacles=args.obstacles,
         difficulty=difficulty,
         power_ups_enabled=not args.no_power_ups,
+        game_mode=game_mode,
     )
 
     game = SnakeGame(config)
@@ -275,12 +294,29 @@ def cmd_play(args: argparse.Namespace) -> int:
         Difficulty.EXTREME: "🔴 Extreme",
     }
 
+    mode_names = {
+        GameMode.CLASSIC: "🎮 Classic",
+        GameMode.TIME_ATTACK: "⏱️ Time Attack (2 min)",
+        GameMode.SURVIVAL: "💪 Survival",
+        GameMode.PUZZLE: "🧩 Puzzle (length 20)",
+    }
+
+    mode_info = ""
+    if game_mode == GameMode.TIME_ATTACK:
+        mode_info = "\n[cyan]Goal:[/cyan] Maximize score in 2 minutes!"
+    elif game_mode == GameMode.SURVIVAL:
+        mode_info = "\n[cyan]Goal:[/cyan] Survive as long as possible (speed increases!)"
+    elif game_mode == GameMode.PUZZLE:
+        mode_info = "\n[cyan]Goal:[/cyan] Reach length 20 to win!"
+
     console.print(
         Panel.fit(
             f"[bold green]PyAISnake v{__version__} - Play Mode[/bold green]\n\n"
+            f"[cyan]Mode:[/cyan] {mode_names.get(game_mode, 'Classic')}\n"
             f"[cyan]Difficulty:[/cyan] {difficulty_names.get(difficulty, 'Normal')}\n"
             f"[cyan]Theme:[/cyan] {theme.value}\n"
-            f"[cyan]Power-ups:[/cyan] {'Enabled' if config.power_ups_enabled else 'Disabled'}\n\n"
+            f"[cyan]Power-ups:[/cyan] {'Enabled' if config.power_ups_enabled else 'Disabled'}"
+            f"{mode_info}\n\n"
             "[cyan]Controls:[/cyan]\n"
             "  Arrow keys / WASD - Move\n"
             "  P / Space - Pause\n"

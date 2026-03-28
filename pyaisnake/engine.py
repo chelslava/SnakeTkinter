@@ -30,6 +30,13 @@ class Difficulty(Enum):
     EXTREME = "extreme"
 
 
+class GameMode(Enum):
+    CLASSIC = "classic"
+    TIME_ATTACK = "time_attack"
+    SURVIVAL = "survival"
+    PUZZLE = "puzzle"
+
+
 class PowerUpType(Enum):
     APPLE = "apple"  # Normal food (+1 score)
     STAR = "star"  # Speed boost for 5 seconds
@@ -96,6 +103,7 @@ class GameConfig:
     wrap_around: bool = False
     difficulty: Difficulty = Difficulty.NORMAL
     power_ups_enabled: bool = True
+    game_mode: GameMode = GameMode.CLASSIC
 
 
 @dataclass
@@ -107,6 +115,7 @@ class GameStats:
     food_eaten: int = 0
     power_ups_collected: int = 0
     start_time: float = field(default_factory=time.time)
+    mode_time_remaining: float | None = None
 
     @property
     def duration(self) -> float:
@@ -125,7 +134,7 @@ DIFFICULTY_CONFIG = {
         "speed_ms": 150,
         "obstacles": 0,
         "power_ups_enabled": True,
-        "power_up_frequency": 0.3,  # 30% chance
+        "power_up_frequency": 0.3,
     },
     Difficulty.NORMAL: {
         "speed_ms": 100,
@@ -144,6 +153,36 @@ DIFFICULTY_CONFIG = {
         "obstacles": 15,
         "power_ups_enabled": False,
         "power_up_frequency": 0,
+    },
+}
+
+# Game mode configs
+GAME_MODE_CONFIG = {
+    GameMode.CLASSIC: {
+        "time_limit": None,
+        "target_length": None,
+        "speed_increase": False,
+        "description": "Standard endless mode",
+    },
+    GameMode.TIME_ATTACK: {
+        "time_limit": 120,  # 2 minutes
+        "target_length": None,
+        "speed_increase": False,
+        "description": "2 minutes to maximize score",
+    },
+    GameMode.SURVIVAL: {
+        "time_limit": None,
+        "target_length": None,
+        "speed_increase": True,
+        "speed_increase_interval": 30,  # Every 30 seconds
+        "speed_increase_factor": 0.9,
+        "description": "Speed increases every 30 seconds",
+    },
+    GameMode.PUZZLE: {
+        "time_limit": None,
+        "target_length": 20,  # Reach length 20 to win
+        "speed_increase": False,
+        "description": "Reach target length to win",
     },
 }
 
@@ -173,6 +212,7 @@ class SnakeGame:
     def __init__(self, config: GameConfig | None = None):
         self.config = config or GameConfig()
         self._apply_difficulty_config()
+        self._apply_game_mode_config()
         self.state = GameState.RUNNING
         self.stats = GameStats()
 
@@ -190,6 +230,10 @@ class SnakeGame:
         self.score_multiplier: float = 1.0
         self.speed_modifier: float = 1.0
 
+        # Game mode state
+        self._mode_start_speed: int = 100
+        self._last_speed_increase: float = 0
+
         # Callbacks
         self.on_food_eaten: Callable[[], None] | None = None
         self.on_collision: Callable[[], None] | None = None
@@ -202,7 +246,7 @@ class SnakeGame:
         """Apply difficulty-based configuration"""
         diff_config = DIFFICULTY_CONFIG.get(self.config.difficulty, {})
 
-        if self.config.speed_ms == 100:  # Default, override with difficulty
+        if self.config.speed_ms == 100:
             self.config.speed_ms = diff_config.get("speed_ms", 100)
 
         if self.config.initial_obstacles == 0:
@@ -210,6 +254,21 @@ class SnakeGame:
 
         self.config.power_ups_enabled = diff_config.get("power_ups_enabled", True)
         self._power_up_frequency = diff_config.get("power_up_frequency", 0.2)
+
+    def _apply_game_mode_config(self) -> None:
+        """Apply game mode configuration"""
+        mode_config = GAME_MODE_CONFIG.get(self.config.game_mode, {})
+
+        self._time_limit = mode_config.get("time_limit")
+        self._target_length = mode_config.get("target_length")
+        self._speed_increase = mode_config.get("speed_increase", False)
+        self._speed_increase_interval = mode_config.get("speed_increase_interval", 30)
+        self._speed_increase_factor = mode_config.get("speed_increase_factor", 0.9)
+
+        if self._time_limit:
+            self.stats.mode_time_remaining = self._time_limit
+
+        self._mode_start_speed = self.config.speed_ms
 
     def _init_game(self) -> None:
         """Initialize game state"""
@@ -227,6 +286,12 @@ class SnakeGame:
         self.shield_count = 0
         self.score_multiplier = 1.0
         self.speed_modifier = 1.0
+        self._last_speed_increase = time.time()
+
+        # Reset time for time attack mode
+        if self._time_limit:
+            self.stats.mode_time_remaining = self._time_limit
+
         self._spawn_food()
 
         if self.config.initial_obstacles > 0:
@@ -342,7 +407,32 @@ class SnakeGame:
         else:
             self.snake.pop()
 
+        # Check game mode conditions
+        self._check_mode_conditions()
+
         return True
+
+    def _check_mode_conditions(self) -> None:
+        """Check game mode specific conditions"""
+        # Time Attack - check time limit
+        if self._time_limit and self.stats.mode_time_remaining is not None:
+            self.stats.mode_time_remaining = max(0, self._time_limit - self.stats.duration)
+            if self.stats.mode_time_remaining <= 0:
+                self.state = GameState.GAME_OVER
+                return
+
+        # Puzzle - check target length
+        if self._target_length and len(self.snake) >= self._target_length:
+            self.state = GameState.WIN
+            return
+
+        # Survival - increase speed
+        if self._speed_increase:
+            elapsed = time.time() - self._last_speed_increase
+            if elapsed >= self._speed_increase_interval:
+                self._mode_start_speed = int(self._mode_start_speed * self._speed_increase_factor)
+                self._mode_start_speed = max(20, self._mode_start_speed)
+                self._last_speed_increase = time.time()
 
     def _collect_power_up(self) -> None:
         """Collect and apply power-up effect"""
@@ -423,7 +513,8 @@ class SnakeGame:
     @property
     def effective_speed(self) -> int:
         """Get effective game speed with modifiers"""
-        return int(self.config.speed_ms * self.speed_modifier)
+        base_speed = self._mode_start_speed if self._speed_increase else self.config.speed_ms
+        return int(base_speed * self.speed_modifier)
 
     def _is_valid_position(self, pos: tuple[int, int]) -> bool:
         """Check if position is valid for movement"""
@@ -453,6 +544,8 @@ class SnakeGame:
         self.shield_count = 0
         self.score_multiplier = 1.0
         self.speed_modifier = 1.0
+        self._mode_start_speed = self.config.speed_ms
+        self._last_speed_increase = time.time()
         self._init_game()
 
     def pause(self) -> None:

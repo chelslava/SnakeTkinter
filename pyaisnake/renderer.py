@@ -9,7 +9,7 @@ from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 
-from .engine import Direction, GameState, PowerUpType, SnakeGame
+from .engine import Direction, GameMode, GameState, PowerUpType, SnakeGame
 
 
 class Theme(Enum):
@@ -264,10 +264,21 @@ class CLIRenderer:
 
         title = "[bold bright_green]PyAISnake[/bold bright_green]"
 
+        # Add game mode to title
+        mode_names = {
+            GameMode.CLASSIC: "",
+            GameMode.TIME_ATTACK: " [cyan]⏱️ Time Attack[/cyan]",
+            GameMode.SURVIVAL: " [orange]💪 Survival[/orange]",
+            GameMode.PUZZLE: " [magenta]🧩 Puzzle[/magenta]",
+        }
+        title += mode_names.get(self.game.config.game_mode, "")
+
         if self.game.state == GameState.PAUSED:
             title += " [bold yellow]⏸ PAUSED[/bold yellow]"
         elif self.game.state == GameState.GAME_OVER:
             title += " [bold red]☠ GAME OVER[/bold red]"
+        elif self.game.state == GameState.WIN:
+            title += " [bold bright_green]🏆 WIN![/bold bright_green]"
 
         # Add active effects to title
         effects = []
@@ -347,9 +358,30 @@ class CLIRenderer:
 
         table.add_row("Score", f"[bold bright_green]{stats.score}[/bold bright_green]")
         table.add_row("Length", str(len(self.game.snake)))
+
+        # Mode-specific stats
+        if (
+            self.game.config.game_mode == GameMode.TIME_ATTACK
+            and stats.mode_time_remaining is not None
+        ):
+            time_val = stats.mode_time_remaining
+            time_color = (
+                "bright_red" if time_val < 30 else "bright_yellow" if time_val < 60 else "cyan"
+            )
+            table.add_row("Time Left", f"[{time_color}]{time_val:.1f}s[/{time_color}]")
+        else:
+            table.add_row("Time", f"{stats.duration:.1f}s")
+
+        if self.game.config.game_mode == GameMode.PUZZLE:
+            target = 20
+            current = len(self.game.snake)
+            progress = min(100, int(current / target * 100))
+            table.add_row(
+                "Progress", f"[bright_magenta]{current}/{target} ({progress}%)[/bright_magenta]"
+            )
+
         table.add_row("Moves", str(stats.moves))
         table.add_row("Food", str(stats.food_eaten))
-        table.add_row("Time", f"{stats.duration:.1f}s")
 
         if stats.moves > 0:
             table.add_row("Efficiency", f"{stats.efficiency:.1%}")
