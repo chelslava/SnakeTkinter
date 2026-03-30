@@ -15,6 +15,7 @@ dependencies = [
     "scikit-learn>=1.0.0",
     "rich>=13.0.0",
     "keyboard>=0.13.0",
+    "textual>=0.47.0",
 ]
 
 [project.optional-dependencies]
@@ -28,6 +29,7 @@ dev = [
 [project.scripts]
 pyaisnake = "pyaisnake.cli:main"
 snake = "pyaisnake.cli:main"
+snaketui = "pyaisnake.tui:main"
 
 [project.urls]
 Homepage = "https://github.com/chelslava/SnakeTkinter"
