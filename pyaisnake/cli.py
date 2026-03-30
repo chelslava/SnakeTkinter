@@ -8,6 +8,7 @@ Commands:
     train      Train AI models
     stats      View game statistics
     tournament Run AI tournament
+    achievements View achievements
 """
 
 import argparse
@@ -23,6 +24,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from . import __version__
+from .achievements import Achievement, AchievementSystem
 from .engine import Difficulty, Direction, GameConfig, GameMode, GameState, SnakeGame
 from .renderer import CLIRenderer, Theme
 
@@ -234,6 +236,14 @@ def create_parser() -> argparse.ArgumentParser:
         default=20,
     )
 
+    # Achievements command
+    achievements_parser = subparsers.add_parser("achievements", help="View achievements")
+    achievements_parser.add_argument(
+        "--export",
+        type=str,
+        help="Export achievements to JSON",
+    )
+
     return parser
 
 
@@ -345,6 +355,14 @@ def _play_keyboard(game: SnakeGame, renderer: CLIRenderer, config: GameConfig) -
     import keyboard
 
     running = True
+    achievement_system = AchievementSystem()
+    achievement_system.start_session()
+    unlocked_queue: list[Achievement] = []
+
+    def on_achievement_unlock(achievement: Achievement) -> None:
+        unlocked_queue.append(achievement)
+
+    achievement_system.on_unlock = on_achievement_unlock
 
     def on_quit():
         nonlocal running
@@ -372,6 +390,25 @@ def _play_keyboard(game: SnakeGame, renderer: CLIRenderer, config: GameConfig) -
         while running:
             if game.state == GameState.RUNNING:
                 game.update()
+
+                safe = game.get_safe_directions()
+                if len(safe) == 1:
+                    achievement_system.record_close_call()
+
+                mode_name = config.game_mode.value if config.game_mode else "classic"
+                newly_unlocked = achievement_system.check_achievements(
+                    score=game.stats.score,
+                    length=len(game.snake),
+                    duration=game.stats.duration,
+                    game_mode=mode_name,
+                    power_ups=game.stats.power_ups_collected,
+                )
+
+                for a in newly_unlocked:
+                    console.print(
+                        f"\n[bold yellow]🏆 Achievement Unlocked: {a.icon} {a.name}[/bold yellow]"
+                    )
+
                 renderer.update()
                 time.sleep(game.effective_speed / 1000)
             elif game.state == GameState.PAUSED:
@@ -383,6 +420,7 @@ def _play_keyboard(game: SnakeGame, renderer: CLIRenderer, config: GameConfig) -
                 if key and key.event_type == keyboard.KEY_DOWN:
                     if key.name == "r":
                         game.reset()
+                        achievement_system.start_session()
                     elif key.name in ("q", "esc"):
                         break
 
@@ -401,6 +439,9 @@ def _play_fallback(game: SnakeGame, renderer: CLIRenderer, config: GameConfig) -
     console.print("[yellow]Using demo mode - AI will play.[/yellow]")
     console.print("[dim]Press Ctrl+C to quit[/dim]\n")
 
+    achievement_system = AchievementSystem()
+    achievement_system.start_session()
+
     time.sleep(1)
 
     try:
@@ -408,16 +449,36 @@ def _play_fallback(game: SnakeGame, renderer: CLIRenderer, config: GameConfig) -
 
         while True:
             if game.state == GameState.RUNNING:
-                safe = game.get_safe_directions()
-                if safe:
-                    game.set_direction(random.choice(safe))
+                safe_dirs = game.get_safe_directions()
+                if safe_dirs:
+                    game.set_direction(random.choice(safe_dirs))
                 game.update()
+
+                safe = game.get_safe_directions()
+                if len(safe) == 1:
+                    achievement_system.record_close_call()
+
+                mode_name = config.game_mode.value if config.game_mode else "classic"
+                newly_unlocked = achievement_system.check_achievements(
+                    score=game.stats.score,
+                    length=len(game.snake),
+                    duration=game.stats.duration,
+                    game_mode=mode_name,
+                    power_ups=game.stats.power_ups_collected,
+                )
+
+                for a in newly_unlocked:
+                    console.print(
+                        f"\n[bold yellow]🏆 Achievement Unlocked: {a.icon} {a.name}[/bold yellow]"
+                    )
+
                 renderer.update()
                 time.sleep(game.effective_speed / 1000)
             elif game.state == GameState.GAME_OVER:
                 renderer.update()
                 time.sleep(2)
                 game.reset()
+                achievement_system.start_session()
 
     except KeyboardInterrupt:
         pass
@@ -740,6 +801,57 @@ class GeneticAI:
         return AStarAI(self.game).get_direction()
 
 
+def cmd_achievements(args: argparse.Namespace) -> int:
+    """Show achievements"""
+    system = AchievementSystem()
+
+    progress = system.get_progress()
+    unlocked = system.get_unlocked()
+    locked = system.get_locked()
+
+    # Progress header
+    console.print(
+        Panel.fit(
+            f"[bold bright_green]🏆 Achievements[/bold bright_green]\n\n"
+            f"[cyan]Progress:[/cyan] {progress['unlocked']}/{progress['total']} ({progress['percentage']}%)",
+            border_style="bright_green",
+        )
+    )
+
+    # Unlocked achievements
+    if unlocked:
+        console.print("\n[bold green]✅ Unlocked[/bold green]")
+        table = Table(show_header=False, box=None, padding=(0, 2))
+        table.add_column(style="dim")
+        table.add_column(style="bold white")
+        table.add_column(style="cyan")
+
+        for a in sorted(unlocked, key=lambda x: x.type.value):
+            table.add_row(a.icon, a.name, a.description)
+
+        console.print(table)
+
+    # Locked achievements (non-secret)
+    if locked:
+        console.print("\n[bold yellow]🔒 Locked[/bold yellow]")
+        table = Table(show_header=False, box=None, padding=(0, 2))
+        table.add_column(style="dim")
+        table.add_column(style="white")
+        table.add_column(style="dim")
+
+        for a in sorted(locked, key=lambda x: (x.type.value, x.threshold)):
+            table.add_row("❓", a.name, a.description)
+
+        console.print(table)
+
+    # Export if requested
+    if args.export:
+        system.export_to_json(args.export)
+        console.print(f"\n[green]Exported to {args.export}[/green]")
+
+    return 0
+
+
 def main() -> int:
     """Main entry point"""
     parser = create_parser()
@@ -759,6 +871,8 @@ def main() -> int:
         return cmd_stats(args)
     elif args.command == "tournament":
         return cmd_tournament(args)
+    elif args.command == "achievements":
+        return cmd_achievements(args)
 
     return 0
 
