@@ -158,9 +158,20 @@ class AchievementSystem:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS achievements (
                 id TEXT PRIMARY KEY,
-                unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                unlocked_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        try:
+            cursor.execute("SELECT id FROM achievements LIMIT 1")
+        except sqlite3.OperationalError:
+            cursor.execute("DROP TABLE IF EXISTS achievements")
+            cursor.execute("""
+                CREATE TABLE achievements (
+                    id TEXT PRIMARY KEY,
+                    unlocked_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
 
         conn.commit()
         conn.close()
