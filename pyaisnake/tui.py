@@ -1,9 +1,12 @@
 """
 Textual TUI for PyAISnake - Modern terminal user interface.
+
+Uses the same rendering as CLI for consistent look.
 """
 
 from __future__ import annotations
 
+from rich.panel import Panel
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Center, Container
@@ -16,9 +19,9 @@ from .renderer import CLIRenderer, Theme
 
 
 class GameWidget(Static):
-    """Widget that renders the snake game using CLI renderer"""
+    """Widget that renders the snake game"""
 
-    game: reactive[SnakeGame | None] = reactive(None, recompose=True)
+    game: reactive[SnakeGame | None] = reactive(None)
     theme: reactive[Theme] = reactive(Theme.DEFAULT)
 
     def __init__(self, game: SnakeGame, theme: Theme = Theme.DEFAULT, **kwargs) -> None:
@@ -27,65 +30,12 @@ class GameWidget(Static):
         self.theme = theme
         self._renderer = CLIRenderer(game, theme=theme)
 
-    def render(self) -> str:
+    def render(self) -> Panel:
         if not self.game:
-            return "No game"
+            return Panel("No game")
 
         self._renderer.game = self.game
-        return self._renderer._render_game_field()
-
-
-class StatsWidget(Static):
-    """Widget that shows game statistics"""
-
-    game: reactive[SnakeGame | None] = reactive(None, recompose=True)
-
-    def __init__(self, game: SnakeGame, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.game = game
-
-    def render(self) -> str:
-        if not self.game:
-            return ""
-
-        stats = self.game.stats
-        lines = [
-            "[bold cyan]Stats[/bold cyan]",
-            "",
-            f"Score: [bold bright_green]{stats.score}[/bold bright_green]",
-            f"Length: {len(self.game.snake)}",
-            f"Time: {stats.duration:.1f}s",
-            f"Moves: {stats.moves}",
-            f"Food: {stats.food_eaten}",
-        ]
-
-        if stats.moves > 0:
-            lines.append(f"Efficiency: {stats.efficiency:.1%}")
-
-        lines.append("")
-        lines.append("[bold cyan]Controls[/bold cyan]")
-        lines.append("")
-        lines.append("↑↓←→ / WASD  Move")
-        lines.append("P / Space    Pause")
-        lines.append("R            Restart")
-        lines.append("Q / Esc      Back")
-
-        dir_arrows = {
-            Direction.UP: "↑",
-            Direction.DOWN: "↓",
-            Direction.LEFT: "←",
-            Direction.RIGHT: "→",
-        }
-        arrow = dir_arrows.get(self.game.direction, "?")
-        lines.append("")
-        lines.append(f"Direction: [bold]{arrow}[/bold]")
-
-        safe = self.game.get_safe_directions()
-        safe_colors = {0: "red", 1: "yellow", 2: "green", 3: "bright_green", 4: "bright_green"}
-        safe_color = safe_colors.get(len(safe), "white")
-        lines.append(f"Safe moves: [{safe_color}]{len(safe)}[/{safe_color}]")
-
-        return "\n".join(lines)
+        return self._renderer._generate_frame()
 
 
 class GameScreen(Screen):
@@ -107,25 +57,6 @@ class GameScreen(Screen):
         Binding("escape", "quit_game", "Back", show=False),
     ]
 
-    CSS = """
-    GameScreen {
-        layout: grid;
-        grid-size: 2 1;
-        grid-columns: 1fr auto;
-    }
-
-    GameWidget {
-        width: auto;
-        height: auto;
-    }
-
-    StatsWidget {
-        width: 28;
-        height: auto;
-        padding: 1 2;
-    }
-    """
-
     def __init__(
         self, config: GameConfig | None = None, theme: Theme = Theme.DEFAULT, **kwargs
     ) -> None:
@@ -138,9 +69,7 @@ class GameScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.game = SnakeGame(self.config)
-
         yield GameWidget(self.game, self.theme)
-        yield StatsWidget(self.game)
 
     def on_mount(self) -> None:
         self._running = True
@@ -154,11 +83,8 @@ class GameScreen(Screen):
         if self.game and self.game.state == GameState.RUNNING and self._running:
             self.game.update()
             game_widget = self.query_one(GameWidget)
-            stats_widget = self.query_one(StatsWidget)
             game_widget.game = self.game
-            stats_widget.game = self.game
             game_widget.refresh()
-            stats_widget.refresh()
 
             if self.game.state == GameState.GAME_OVER:
                 self._running = False
@@ -205,9 +131,9 @@ class MainMenuScreen(Screen):
     }
 
     .menu-container {
-        width: 50;
+        width: auto;
         height: auto;
-        padding: 2;
+        padding: 1;
     }
 
     .title {
@@ -216,7 +142,7 @@ class MainMenuScreen(Screen):
     }
 
     .menu-button {
-        width: 100%;
+        width: 30;
         margin: 1;
     }
     """
@@ -245,6 +171,11 @@ class PyAISnakeTUI(App):
     CSS = """
     Screen {
         background: $surface;
+    }
+
+    GameWidget {
+        height: auto;
+        width: auto;
     }
     """
 
