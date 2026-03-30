@@ -6,68 +6,33 @@ from __future__ import annotations
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Center, Container, Horizontal, Vertical
+from textual.containers import Center, Container
 from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Label, Static
 
 from .engine import Direction, GameConfig, GameState, SnakeGame
+from .renderer import CLIRenderer, Theme
 
 
 class GameWidget(Static):
-    """Widget that renders the snake game"""
+    """Widget that renders the snake game using CLI renderer"""
 
     game: reactive[SnakeGame | None] = reactive(None, recompose=True)
+    theme: reactive[Theme] = reactive(Theme.DEFAULT)
 
-    def __init__(self, game: SnakeGame, **kwargs) -> None:
+    def __init__(self, game: SnakeGame, theme: Theme = Theme.DEFAULT, **kwargs) -> None:
         super().__init__(**kwargs)
         self.game = game
+        self.theme = theme
+        self._renderer = CLIRenderer(game, theme=theme)
 
     def render(self) -> str:
         if not self.game:
             return "No game"
 
-        lines = []
-        config = self.game.config
-        w, h = config.width, config.height
-
-        border = "══" * w
-        lines.append(f"╔{border}╗")
-
-        snake_set = set(self.game.snake)
-        head = self.game.snake[0] if self.game.snake else None
-        food = self.game.food
-
-        for y in range(h):
-            row_parts = ["║"]
-            for x in range(w):
-                pos = (x, y)
-                if pos == head:
-                    row_parts.append("@@")
-                elif pos in snake_set:
-                    row_parts.append("oo")
-                elif pos == food:
-                    row_parts.append("**")
-                elif pos in self.game.obstacles:
-                    row_parts.append("##")
-                else:
-                    row_parts.append("  ")
-            row_parts.append("║")
-            lines.append("".join(row_parts))
-
-        lines.append(f"╚{border}╝")
-
-        status = ""
-        if self.game.state == GameState.PAUSED:
-            status = " [PAUSED]"
-        elif self.game.state == GameState.GAME_OVER:
-            status = " [GAME OVER]"
-        elif self.game.state == GameState.WIN:
-            status = " [WIN!]"
-
-        lines.append(f"Score: {self.game.stats.score} | Length: {len(self.game.snake)}{status}")
-
-        return "\n".join(lines)
+        self._renderer.game = self.game
+        return self._renderer._render_game_field()
 
 
 class StatsWidget(Static):
@@ -85,33 +50,42 @@ class StatsWidget(Static):
 
         stats = self.game.stats
         lines = [
-            "[bold cyan]═══ Stats ═══[/bold cyan]",
+            "[bold cyan]Stats[/bold cyan]",
             "",
-            f"  [cyan]Score:[/cyan]     [bold]{stats.score}[/bold]",
-            f"  [cyan]Length:[/cyan]    {len(self.game.snake)}",
-            f"  [cyan]Time:[/cyan]      {stats.duration:.1f}s",
-            f"  [cyan]Moves:[/cyan]     {stats.moves}",
-            f"  [cyan]Food:[/cyan]      {stats.food_eaten}",
+            f"Score: [bold bright_green]{stats.score}[/bold bright_green]",
+            f"Length: {len(self.game.snake)}",
+            f"Time: {stats.duration:.1f}s",
+            f"Moves: {stats.moves}",
+            f"Food: {stats.food_eaten}",
         ]
 
         if stats.moves > 0:
-            lines.append(f"  [cyan]Efficiency:[/cyan] {stats.efficiency:.1%}")
+            lines.append(f"Efficiency: {stats.efficiency:.1%}")
+
+        lines.append("")
+        lines.append("[bold cyan]Controls[/bold cyan]")
+        lines.append("")
+        lines.append("↑↓←→ / WASD  Move")
+        lines.append("P / Space    Pause")
+        lines.append("R            Restart")
+        lines.append("Q / Esc      Back")
+
+        dir_arrows = {
+            Direction.UP: "↑",
+            Direction.DOWN: "↓",
+            Direction.LEFT: "←",
+            Direction.RIGHT: "→",
+        }
+        arrow = dir_arrows.get(self.game.direction, "?")
+        lines.append("")
+        lines.append(f"Direction: [bold]{arrow}[/bold]")
+
+        safe = self.game.get_safe_directions()
+        safe_colors = {0: "red", 1: "yellow", 2: "green", 3: "bright_green", 4: "bright_green"}
+        safe_color = safe_colors.get(len(safe), "white")
+        lines.append(f"Safe moves: [{safe_color}]{len(safe)}[/{safe_color}]")
 
         return "\n".join(lines)
-
-
-class ControlsWidget(Static):
-    """Widget that shows controls"""
-
-    def render(self) -> str:
-        return """
-[bold cyan]═══ Controls ═══[/bold cyan]
-
-  [cyan]↑↓←→ / WASD[/cyan]  Move
-  [cyan]P / Space[/cyan]    Pause
-  [cyan]R[/cyan]            Restart
-  [cyan]Q / Esc[/cyan]      Back
-"""
 
 
 class GameScreen(Screen):
@@ -133,9 +107,31 @@ class GameScreen(Screen):
         Binding("escape", "quit_game", "Back", show=False),
     ]
 
-    def __init__(self, config: GameConfig | None = None, **kwargs) -> None:
+    CSS = """
+    GameScreen {
+        layout: grid;
+        grid-size: 2 1;
+        grid-columns: 1fr auto;
+    }
+
+    GameWidget {
+        width: auto;
+        height: auto;
+    }
+
+    StatsWidget {
+        width: 28;
+        height: auto;
+        padding: 1 2;
+    }
+    """
+
+    def __init__(
+        self, config: GameConfig | None = None, theme: Theme = Theme.DEFAULT, **kwargs
+    ) -> None:
         super().__init__(**kwargs)
         self.config = config or GameConfig(width=30, height=15, speed_ms=150)
+        self.theme = theme
         self.game: SnakeGame | None = None
         self._running = False
         self._timer = None
@@ -143,14 +139,8 @@ class GameScreen(Screen):
     def compose(self) -> ComposeResult:
         self.game = SnakeGame(self.config)
 
-        yield Header()
-        with Container(classes="game-container"), Horizontal():
-            with Vertical(classes="game-area"):
-                yield Center(GameWidget(self.game, id="game"))
-            with Vertical(classes="sidebar"):
-                yield StatsWidget(self.game, id="stats")
-                yield ControlsWidget()
-        yield Footer()
+        yield GameWidget(self.game, self.theme)
+        yield StatsWidget(self.game)
 
     def on_mount(self) -> None:
         self._running = True
@@ -163,8 +153,8 @@ class GameScreen(Screen):
     def game_tick(self) -> None:
         if self.game and self.game.state == GameState.RUNNING and self._running:
             self.game.update()
-            game_widget = self.query_one("#game", GameWidget)
-            stats_widget = self.query_one("#stats", StatsWidget)
+            game_widget = self.query_one(GameWidget)
+            stats_widget = self.query_one(StatsWidget)
             game_widget.game = self.game
             stats_widget.game = self.game
             game_widget.refresh()
@@ -210,19 +200,19 @@ class MainMenuScreen(Screen):
     ]
 
     CSS = """
-    Screen {
+    MainMenuScreen {
         align: center middle;
     }
 
     .menu-container {
-        width: 60;
+        width: 50;
         height: auto;
         padding: 2;
     }
 
     .title {
         text-align: center;
-        margin-bottom: 2;
+        margin-bottom: 1;
     }
 
     .menu-button {
@@ -235,7 +225,7 @@ class MainMenuScreen(Screen):
         yield Header()
         with Center(), Container(classes="menu-container"):
             yield Label("[bold bright_green]🐍 PyAISnake[/bold bright_green]", classes="title")
-            yield Label("[dim]TUI Edition[/dim]", classes="title")
+            yield Label("[dim]Terminal UI Edition[/dim]", classes="title")
             yield Button("▶ Play", id="play", variant="success", classes="menu-button")
             yield Button("❌ Quit", id="quit", variant="error", classes="menu-button")
         yield Footer()
@@ -255,29 +245,6 @@ class PyAISnakeTUI(App):
     CSS = """
     Screen {
         background: $surface;
-    }
-
-    .game-container {
-        width: 100%;
-        height: 100%;
-        padding: 1;
-    }
-
-    .game-area {
-        width: auto;
-        height: auto;
-    }
-
-    .sidebar {
-        width: 25;
-        height: auto;
-        padding: 1;
-        margin-left: 2;
-    }
-
-    GameWidget, StatsWidget, ControlsWidget {
-        height: auto;
-        padding: 1;
     }
     """
 
