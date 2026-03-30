@@ -244,6 +244,42 @@ def create_parser() -> argparse.ArgumentParser:
         help="Export achievements to JSON",
     )
 
+    # Multiplayer command
+    mp_parser = subparsers.add_parser("multiplayer", help="Play local multiplayer")
+    mp_parser.add_argument(
+        "--width",
+        "-W",
+        type=int,
+        default=40,
+        help="Game field width (default: 40)",
+    )
+    mp_parser.add_argument(
+        "--height",
+        "-H",
+        type=int,
+        default=20,
+        help="Game field height (default: 20)",
+    )
+    mp_parser.add_argument(
+        "--speed",
+        "-s",
+        type=int,
+        default=100,
+        help="Game speed in ms (default: 100)",
+    )
+    mp_parser.add_argument(
+        "--score",
+        type=int,
+        default=None,
+        help="Score to win (default: no limit)",
+    )
+    mp_parser.add_argument(
+        "--time",
+        type=float,
+        default=None,
+        help="Time limit in seconds (default: no limit)",
+    )
+
     return parser
 
 
@@ -1026,6 +1062,100 @@ def cmd_achievements(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_multiplayer(args: argparse.Namespace) -> int:
+    """Run local multiplayer game"""
+    from .multiplayer import MultiplayerConfig, MultiplayerGame, MultiplayerState
+    from .renderer import MultiplayerRenderer
+
+    config = MultiplayerConfig(
+        width=args.width,
+        height=args.height,
+        speed_ms=args.speed,
+        score_to_win=args.score,
+        time_limit=args.time,
+    )
+
+    game = MultiplayerGame(config)
+    renderer = MultiplayerRenderer(game)
+
+    console.print(
+        Panel.fit(
+            f"[bold green]PyAISnake v{__version__} - Multiplayer Mode[/bold green]\n\n"
+            f"[cyan]Field:[/cyan] {args.width}x{args.height}\n"
+            f"[cyan]Speed:[/cyan] {args.speed}ms\n"
+            f"[cyan]Score to win:[/cyan] {args.score or 'No limit'}\n"
+            f"[cyan]Time limit:[/cyan] {args.time or 'No limit'}s\n\n"
+            "[bright_cyan]Player 1 (Cyan):[/bright_cyan] WASD\n"
+            "[bright_magenta]Player 2 (Magenta):[/bright_magenta] Arrow Keys\n\n"
+            "[cyan]Controls:[/cyan]\n"
+            "  P / Space - Pause\n"
+            "  R - Restart\n"
+            "  Q / Esc - Quit\n\n"
+            "[dim]Press any key to start...[/dim]",
+            border_style="green",
+        )
+    )
+
+    if not KEYBOARD_AVAILABLE:
+        console.print("[red]Error: keyboard library required for multiplayer[/red]")
+        console.print("[dim]Install with: pip install keyboard[/dim]")
+        return 1
+
+    import keyboard
+
+    running = True
+
+    def on_quit():
+        nonlocal running
+        running = False
+
+    keyboard.add_hotkey("w", lambda: game.set_direction1(Direction.UP))
+    keyboard.add_hotkey("s", lambda: game.set_direction1(Direction.DOWN))
+    keyboard.add_hotkey("a", lambda: game.set_direction1(Direction.LEFT))
+    keyboard.add_hotkey("d", lambda: game.set_direction1(Direction.RIGHT))
+    keyboard.add_hotkey("up", lambda: game.set_direction2(Direction.UP))
+    keyboard.add_hotkey("down", lambda: game.set_direction2(Direction.DOWN))
+    keyboard.add_hotkey("left", lambda: game.set_direction2(Direction.LEFT))
+    keyboard.add_hotkey("right", lambda: game.set_direction2(Direction.RIGHT))
+    keyboard.add_hotkey("p", game.pause)
+    keyboard.add_hotkey("space", game.pause)
+    keyboard.add_hotkey("r", game.reset)
+    keyboard.add_hotkey("q", on_quit)
+    keyboard.add_hotkey("esc", on_quit)
+
+    keyboard.read_event()
+
+    try:
+        renderer.start_live()
+
+        while running:
+            if game.state == MultiplayerState.RUNNING:
+                game.update()
+                renderer.update()
+                time.sleep(config.speed_ms / 1000)
+            elif game.state == MultiplayerState.PAUSED:
+                renderer.update()
+                time.sleep(0.1)
+            else:
+                renderer.update()
+                key = keyboard.read_event()
+                if key and key.event_type == keyboard.KEY_DOWN:
+                    if key.name == "r":
+                        game.reset()
+                    elif key.name in ("q", "esc"):
+                        break
+
+    finally:
+        renderer.stop_live()
+        keyboard.unhook_all()
+
+    console.print(f"\n[bright_cyan]Player 1 Score:[/bright_cyan] [bold]{game.stats1.score}[/bold]")
+    console.print(
+        f"[bright_magenta]Player 2 Score:[/bright_magenta] [bold]{game.stats2.score}[/bold]"
+    )
+    return 0
+
+
 def main() -> int:
     """Main entry point"""
     parser = create_parser()
@@ -1047,6 +1177,8 @@ def main() -> int:
         return cmd_tournament(args)
     elif args.command == "achievements":
         return cmd_achievements(args)
+    elif args.command == "multiplayer":
+        return cmd_multiplayer(args)
 
     return 0
 

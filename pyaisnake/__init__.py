@@ -21,7 +21,7 @@ from .controller import CLIController
 from .engine import Direction, GameConfig, GameState, SnakeGame
 from .renderer import CLIRenderer
 
-__version__ = "2.5.0"
+__version__ = "2.6.0"
 __all__ = [
     "Direction",
     "GameConfig",

@@ -14,6 +14,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from .engine import Direction, GameMode, GameState, PowerUpType, SnakeGame
+from .multiplayer import MultiplayerGame
 
 
 @dataclass
@@ -591,3 +592,145 @@ class CLIRenderer:
             table.add_row(str(key), str(value))
 
         self.console.print(table)
+
+
+class MultiplayerRenderer:
+    """Renderer for multiplayer games"""
+
+    P1_COLOR = "bright_cyan"
+    P2_COLOR = "bright_magenta"
+    FOOD_COLOR = "bright_yellow"
+
+    def __init__(self, game: MultiplayerGame, console: Console | None = None):
+        self.game = game
+        self.console = console or Console()
+        self._live: Live | None = None
+
+    def start_live(self) -> None:
+        """Start live display"""
+        self._live = Live(
+            self._generate_frame(),
+            console=self.console,
+            refresh_per_second=30,
+            screen=True,
+        )
+        self._live.start()
+
+    def stop_live(self) -> None:
+        """Stop live display"""
+        if self._live:
+            self._live.stop()
+            self._live = None
+
+    def update(self) -> None:
+        """Update display"""
+        if self._live:
+            self._live.update(self._generate_frame())
+
+    def _generate_frame(self) -> Panel:
+        """Generate complete frame"""
+        game_field = self._render_game_field()
+        stats_panel = self._render_stats()
+
+        layout = Table(show_header=False, show_edge=False, expand=False)
+        layout.add_column()
+        layout.add_column()
+        layout.add_row(game_field, stats_panel)
+
+        title = "[bold bright_green]🐍 Multiplayer Snake[/bold bright_green]"
+
+        state = self.game.state
+        if state.value == "paused":
+            title += " [bold yellow]⏸ PAUSED[/bold yellow]"
+        elif state.value == "p1_wins":
+            title += f" [{self.P1_COLOR}]🏆 PLAYER 1 WINS![/{self.P1_COLOR}]"
+        elif state.value == "p2_wins":
+            title += f" [{self.P2_COLOR}]🏆 PLAYER 2 WINS![/{self.P2_COLOR}]"
+        elif state.value == "draw":
+            title += " [bold white]🤝 DRAW![/bold white]"
+
+        return Panel(
+            layout,
+            title=title,
+            title_align="left",
+            border_style="bright_green",
+            padding=(0, 1),
+        )
+
+    def _render_game_field(self) -> str:
+        """Render game field with both snakes"""
+        lines = []
+        config = self.game.config
+        w, h = config.width, config.height
+
+        border = "══" * w
+        lines.append(f"╔{border}╗")
+
+        snake1_set = set(self.game.snake1)
+        snake2_set = set(self.game.snake2)
+        head1 = self.game.snake1[0] if self.game.snake1 else None
+        head2 = self.game.snake2[0] if self.game.snake2 else None
+        food = self.game.food
+
+        for y in range(h):
+            row_parts = ["║"]
+
+            for x in range(w):
+                pos = (x, y)
+
+                if pos == head1:
+                    row_parts.append(f"[{self.P1_COLOR}]◈◈[/{self.P1_COLOR}]")
+                elif pos == head2:
+                    row_parts.append(f"[{self.P2_COLOR}]◈◈[/{self.P2_COLOR}]")
+                elif pos in snake1_set:
+                    row_parts.append(f"[{self.P1_COLOR}]◇◇[/{self.P1_COLOR}]")
+                elif pos in snake2_set:
+                    row_parts.append(f"[{self.P2_COLOR}]◇◇[/{self.P2_COLOR}]")
+                elif pos == food:
+                    row_parts.append(f"[{self.FOOD_COLOR}]🍎[/{{self.FOOD_COLOR}}]")
+                elif pos in self.game.obstacles:
+                    row_parts.append("[dim yellow]▒▒[/dim yellow]")
+                else:
+                    row_parts.append("  ")
+
+            row_parts.append("║")
+            lines.append("".join(row_parts))
+
+        lines.append(f"╚{border}╝")
+        return "\n".join(lines)
+
+    def _render_stats(self) -> Panel:
+        """Render stats panel for both players"""
+        table = Table(show_header=False, box=None, padding=(0, 2))
+        table.add_column(justify="right", style="cyan", no_wrap=True)
+        table.add_column(justify="left", style="bold white", no_wrap=True)
+
+        table.add_row("", "")
+        table.add_row(
+            f"[{self.P1_COLOR}]Player 1[/{self.P1_COLOR}]",
+            "[bold]WASD[/bold]",
+        )
+        table.add_row(
+            "Score", f"[bold {self.P1_COLOR}]{self.game.stats1.score}[/bold {self.P1_COLOR}]"
+        )
+        table.add_row("Length", str(len(self.game.snake1)))
+        table.add_row("", "")
+
+        table.add_row(
+            f"[{self.P2_COLOR}]Player 2[/{self.P2_COLOR}]",
+            "[bold]Arrow Keys[/bold]",
+        )
+        table.add_row(
+            "Score", f"[bold {self.P2_COLOR}]{self.game.stats2.score}[/bold {self.P2_COLOR}]"
+        )
+        table.add_row("Length", str(len(self.game.snake2)))
+        table.add_row("", "")
+
+        table.add_row("Time", f"{time.time() - self.game._start_time:.1f}s")
+
+        return Panel(
+            table,
+            title="[bold cyan]Stats[/bold cyan]",
+            border_style="dim cyan",
+            padding=(1, 1),
+        )
