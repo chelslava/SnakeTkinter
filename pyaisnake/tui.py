@@ -17,7 +17,7 @@ from .engine import Direction, GameConfig, GameState, SnakeGame
 class GameWidget(Static):
     """Widget that renders the snake game"""
 
-    game: reactive[SnakeGame | None] = reactive(None)
+    game: reactive[SnakeGame | None] = reactive(None, recompose=True)
 
     def __init__(self, game: SnakeGame, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -25,7 +25,7 @@ class GameWidget(Static):
 
     def render(self) -> str:
         if not self.game:
-            return ""
+            return "No game"
 
         lines = []
         config = self.game.config
@@ -57,13 +57,23 @@ class GameWidget(Static):
 
         lines.append(f"╚{border}╝")
 
+        status = ""
+        if self.game.state == GameState.PAUSED:
+            status = " [bold yellow]⏸ PAUSED[/bold yellow]"
+        elif self.game.state == GameState.GAME_OVER:
+            status = " [bold red]☠ GAME OVER[/bold red]"
+        elif self.game.state == GameState.WIN:
+            status = " [bold bright_green]🏆 WIN![/bold bright_green]"
+
+        lines.append(f"Score: {self.game.stats.score} | Length: {len(self.game.snake)}{status}")
+
         return "\n".join(lines)
 
 
 class StatsWidget(Static):
     """Widget that shows game statistics"""
 
-    game: reactive[SnakeGame | None] = reactive(None)
+    game: reactive[SnakeGame | None] = reactive(None, recompose=True)
 
     def __init__(self, game: SnakeGame, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -100,7 +110,7 @@ class ControlsWidget(Static):
   [cyan]↑↓←→ / WASD[/cyan]  Move
   [cyan]P / Space[/cyan]    Pause
   [cyan]R[/cyan]            Restart
-  [cyan]Q / Esc[/cyan]      Quit
+  [cyan]Q / Esc[/cyan]      Back
 """
 
 
@@ -108,20 +118,27 @@ class GameScreen(Screen):
     """Main game screen"""
 
     BINDINGS = [
-        Binding("up,w", "move_up", "Up", show=False),
-        Binding("down,s", "move_down", "Down", show=False),
-        Binding("left,a", "move_left", "Left", show=False),
-        Binding("right,d", "move_right", "Right", show=False),
-        Binding("p,space", "toggle_pause", "Pause"),
+        Binding("up", "move_up", "Up", show=False),
+        Binding("down", "move_down", "Down", show=False),
+        Binding("left", "move_left", "Left", show=False),
+        Binding("right", "move_right", "Right", show=False),
+        Binding("w", "move_up", "Up", show=False),
+        Binding("s", "move_down", "Down", show=False),
+        Binding("a", "move_left", "Left", show=False),
+        Binding("d", "move_right", "Right", show=False),
+        Binding("p", "toggle_pause", "Pause"),
+        Binding("space", "toggle_pause", "Pause", show=False),
         Binding("r", "restart", "Restart"),
-        Binding("q,escape", "quit_game", "Quit"),
+        Binding("q", "quit_game", "Back"),
+        Binding("escape", "quit_game", "Back", show=False),
     ]
 
     def __init__(self, config: GameConfig | None = None, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.config = config or GameConfig()
+        self.config = config or GameConfig(width=30, height=15, speed_ms=150)
         self.game: SnakeGame | None = None
         self._running = False
+        self._timer = None
 
     def compose(self) -> ComposeResult:
         self.game = SnakeGame(self.config)
@@ -137,13 +154,21 @@ class GameScreen(Screen):
 
     def on_mount(self) -> None:
         self._running = True
-        self.set_interval(self.config.speed_ms / 1000, self.game_tick)
+        self._timer = self.set_interval(self.config.speed_ms / 1000, self.game_tick)
+
+    def on_unmount(self) -> None:
+        if self._timer:
+            self._timer.stop()
 
     def game_tick(self) -> None:
         if self.game and self.game.state == GameState.RUNNING and self._running:
             self.game.update()
-            self.query_one("#game", GameWidget).game = self.game
-            self.query_one("#stats", StatsWidget).game = self.game
+            game_widget = self.query_one("#game", GameWidget)
+            stats_widget = self.query_one("#stats", StatsWidget)
+            game_widget.game = self.game
+            stats_widget.game = self.game
+            game_widget.refresh()
+            stats_widget.refresh()
 
             if self.game.state == GameState.GAME_OVER:
                 self._running = False
@@ -210,16 +235,8 @@ class MainMenuScreen(Screen):
         yield Header()
         with Center(), Container(classes="menu-container"):
             yield Label("[bold bright_green]🐍 PyAISnake[/bold bright_green]", classes="title")
-            yield Label("[dim]TUI Edition v2.9.0[/dim]", classes="title")
+            yield Label("[dim]TUI Edition[/dim]", classes="title")
             yield Button("▶ Play", id="play", variant="success", classes="menu-button")
-            yield Button("🤖 AI Mode", id="ai", variant="primary", classes="menu-button")
-            yield Button(
-                "🎮 Multiplayer", id="multiplayer", variant="warning", classes="menu-button"
-            )
-            yield Button("🎯 Levels", id="levels", variant="primary", classes="menu-button")
-            yield Button(
-                "🏆 Achievements", id="achievements", variant="warning", classes="menu-button"
-            )
             yield Button("❌ Quit", id="quit", variant="error", classes="menu-button")
         yield Footer()
 
