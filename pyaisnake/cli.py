@@ -280,6 +280,30 @@ def create_parser() -> argparse.ArgumentParser:
         help="Time limit in seconds (default: no limit)",
     )
 
+    # Levels command
+    levels_parser = subparsers.add_parser("levels", help="List and manage levels")
+    levels_parser.add_argument(
+        "--list",
+        "-l",
+        action="store_true",
+        help="List all available levels",
+    )
+
+    # Level command - play a specific level
+    level_parser = subparsers.add_parser("level", help="Play a specific level")
+    level_parser.add_argument(
+        "name",
+        type=str,
+        help="Level name or path to JSON file",
+    )
+    level_parser.add_argument(
+        "--theme",
+        "-t",
+        choices=["default", "neon", "retro", "minimal", "hacker"],
+        default="default",
+        help="Color theme",
+    )
+
     return parser
 
 
@@ -1156,6 +1180,178 @@ def cmd_multiplayer(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_levels(args: argparse.Namespace) -> int:
+    """List available levels"""
+    from .levels import BUILTIN_LEVELS, list_levels
+
+    table = Table(title="[bold cyan]Available Levels[/bold cyan]")
+    table.add_column("Name", style="cyan")
+    table.add_column("Description", style="white")
+    table.add_column("Size", style="dim")
+    table.add_column("Objective", style="yellow")
+
+    for name in list_levels():
+        level = BUILTIN_LEVELS[name]
+        obj_str = f"{level.objective.value}: {level.objective_value}"
+        table.add_row(
+            name,
+            level.description or level.name,
+            f"{level.width}x{level.height}",
+            obj_str,
+        )
+
+    console.print(table)
+    console.print("\n[dim]Usage: pyaisnake level <name>[/dim]")
+    console.print("[dim]Or use a JSON file: pyaisnake level my_level.json[/dim]")
+
+    return 0
+
+
+def cmd_level(args: argparse.Namespace) -> int:
+    """Play a specific level"""
+    from .levels import LevelConfig, get_level
+
+    level_path = Path(args.name)
+    if level_path.exists() and level_path.suffix == ".json":
+        level = LevelConfig.load(str(level_path))
+    else:
+        level = get_level(args.name)
+        if not level:
+            console.print(f"[red]Level not found: {args.name}[/red]")
+            console.print("[dim]Use 'pyaisnake levels' to see available levels[/dim]")
+            return 1
+
+    theme = _get_theme(args.theme)
+
+    config = GameConfig(
+        width=level.width,
+        height=level.height,
+        speed_ms=level.speed_ms,
+        initial_obstacles=len(level.obstacles),
+        wrap_around=level.walls_wrap,
+    )
+
+    game = SnakeGame(config)
+    game.obstacles = set(level.obstacles)
+
+    if level.start_position:
+        start_x, start_y = level.start_position
+        game.snake = [
+            (start_x, start_y),
+            (start_x - 1, start_y),
+            (start_x - 2, start_y),
+        ]
+
+    renderer = CLIRenderer(game, theme=theme)
+
+    objective_names = {
+        "reach_score": f"Score {level.objective_value}",
+        "reach_length": f"Length {level.objective_value}",
+        "survive_time": f"Survive {level.objective_value}s",
+        "collect_all": f"Collect {level.objective_value}",
+    }
+
+    console.print(
+        Panel.fit(
+            f"[bold green]PyAISnake v{__version__} - {level.name}[/bold green]\n\n"
+            f"[cyan]Description:[/cyan] {level.description or 'No description'}\n"
+            f"[cyan]Size:[/cyan] {level.width}x{level.height}\n"
+            f"[cyan]Speed:[/cyan] {level.speed_ms}ms\n"
+            f"[cyan]Obstacles:[/cyan] {len(level.obstacles)}\n"
+            f"[cyan]Objective:[/cyan] {objective_names.get(level.objective.value, level.objective.value)}\n\n"
+            "[cyan]Controls:[/cyan]\n"
+            "  Arrow keys / WASD - Move\n"
+            "  P / Space - Pause\n"
+            "  R - Restart\n"
+            "  Q / Esc - Quit\n\n"
+            "[dim]Press any key to start...[/dim]",
+            border_style="green",
+        )
+    )
+
+    if KEYBOARD_AVAILABLE:
+        return _play_level(game, renderer, config, level)
+    else:
+        return _play_fallback(game, renderer, config)
+
+
+def _play_level(game: SnakeGame, renderer: CLIRenderer, config: GameConfig, level) -> int:
+    """Play a level with keyboard"""
+    import keyboard
+
+    from .levels import LevelObjective
+
+    running = True
+
+    def on_quit():
+        nonlocal running
+        running = False
+
+    keyboard.add_hotkey("up", lambda: game.set_direction(Direction.UP))
+    keyboard.add_hotkey("down", lambda: game.set_direction(Direction.DOWN))
+    keyboard.add_hotkey("left", lambda: game.set_direction(Direction.LEFT))
+    keyboard.add_hotkey("right", lambda: game.set_direction(Direction.RIGHT))
+    keyboard.add_hotkey("w", lambda: game.set_direction(Direction.UP))
+    keyboard.add_hotkey("s", lambda: game.set_direction(Direction.DOWN))
+    keyboard.add_hotkey("a", lambda: game.set_direction(Direction.LEFT))
+    keyboard.add_hotkey("d", lambda: game.set_direction(Direction.RIGHT))
+    keyboard.add_hotkey("p", game.pause)
+    keyboard.add_hotkey("space", game.pause)
+    keyboard.add_hotkey("r", game.reset)
+    keyboard.add_hotkey("q", on_quit)
+    keyboard.add_hotkey("esc", on_quit)
+
+    keyboard.read_event()
+
+    start_time = time.time()
+
+    try:
+        renderer.start_live()
+
+        while running:
+            if game.state == GameState.RUNNING:
+                game.update()
+
+                if level.objective == LevelObjective.REACH_SCORE:
+                    if game.stats.score >= level.objective_value:
+                        game.state = GameState.WIN
+                elif level.objective == LevelObjective.REACH_LENGTH:
+                    if len(game.snake) >= level.objective_value:
+                        game.state = GameState.WIN
+                elif level.objective == LevelObjective.SURVIVE_TIME:
+                    elapsed = time.time() - start_time
+                    if elapsed >= level.objective_value:
+                        game.state = GameState.WIN
+
+                renderer.update()
+                time.sleep(game.effective_speed / 1000)
+            elif game.state == GameState.PAUSED:
+                renderer.update()
+                time.sleep(0.1)
+            elif game.state in (GameState.GAME_OVER, GameState.WIN):
+                renderer.update()
+                key = keyboard.read_event()
+                if key and key.event_type == keyboard.KEY_DOWN:
+                    if key.name == "r":
+                        game.reset()
+                        start_time = time.time()
+                    elif key.name in ("q", "esc"):
+                        break
+
+    finally:
+        renderer.stop_live()
+        keyboard.unhook_all()
+
+    if game.state == GameState.WIN:
+        console.print("\n[bold green]🎉 Level Complete![/bold green]")
+    else:
+        console.print("\n[bold red]Game Over[/bold red]")
+
+    console.print(f"[cyan]Final score:[/cyan] [bold]{game.stats.score}[/bold]")
+    console.print(f"[cyan]Final length:[/cyan] {len(game.snake)}")
+    return 0
+
+
 def main() -> int:
     """Main entry point"""
     parser = create_parser()
@@ -1179,6 +1375,10 @@ def main() -> int:
         return cmd_achievements(args)
     elif args.command == "multiplayer":
         return cmd_multiplayer(args)
+    elif args.command == "levels":
+        return cmd_levels(args)
+    elif args.command == "level":
+        return cmd_level(args)
 
     return 0
 
