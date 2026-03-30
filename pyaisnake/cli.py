@@ -118,7 +118,7 @@ def create_parser() -> argparse.ArgumentParser:
     ai_parser.add_argument(
         "--algorithm",
         "-a",
-        choices=["a_star", "neural", "genetic", "random"],
+        choices=["a_star", "neural", "genetic", "random", "dqn"],
         default="a_star",
         help="AI algorithm to use (default: a_star)",
     )
@@ -171,7 +171,7 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument(
         "--algorithm",
         "-a",
-        choices=["neural", "genetic"],
+        choices=["neural", "genetic", "dqn"],
         required=True,
         help="Algorithm to train",
     )
@@ -562,6 +562,14 @@ def _create_ai(algorithm: str, game: SnakeGame):
         return NeuralAI(game)
     elif algorithm == "genetic":
         return GeneticAI(game)
+    elif algorithm == "dqn":
+        from .ai.dqn import DQNAI
+
+        ai = DQNAI(game)
+        model_path = Path("dqn_model.pkl")
+        if model_path.exists():
+            ai.load_model(str(model_path))
+        return ai
     else:
         return RandomAI(game)
 
@@ -586,11 +594,70 @@ def _show_ai_summary(results: list) -> None:
 
 def cmd_train(args: argparse.Namespace) -> int:
     """Train AI models"""
-    console.print(f"[bold cyan]Training {args.algorithm} AI...[/bold cyan]")
+    if args.algorithm not in ("neural", "dqn"):
+        console.print(f"[red]Training not supported for {args.algorithm}[/red]")
+        return 1
+
+    from .ai.dqn import DQNAI
+
+    console.print("[bold cyan]Training DQN AI...[/bold cyan]")
     console.print(f"Games: {args.games}")
 
-    console.print("[yellow]Training mode is under development.[/yellow]")
-    console.print("[dim]Use 'play' and 'ai' modes for now.[/dim]")
+    config = GameConfig(width=20, height=20, speed_ms=0)
+
+    dqn_path = Path("dqn_model.pkl")
+    scores_history: list[int] = []
+    best_score = 0
+
+    game = SnakeGame(config)
+    ai = DQNAI(game, epsilon_start=1.0, epsilon_end=0.01, epsilon_decay=0.995)
+    ai.start_training()
+
+    if dqn_path.exists():
+        ai.load_model(str(dqn_path))
+
+    for episode in range(args.games):
+        game = SnakeGame(config)
+        ai.game = game
+
+        steps = 0
+        while game.state == GameState.RUNNING and steps < 1000:
+            direction = ai.get_direction()
+            if direction:
+                game.set_direction(direction)
+            game.update()
+            steps += 1
+
+        scores_history.append(game.stats.score)
+
+        if game.stats.score > best_score:
+            best_score = game.stats.score
+
+        if (episode + 1) % 10 == 0:
+            avg_score = sum(scores_history[-10:]) / 10
+            console.print(
+                f"Episode {episode + 1}/{args.games} | "
+                f"Score: {game.stats.score} | "
+                f"Avg(10): {avg_score:.1f} | "
+                f"Best: {best_score} | "
+                f"Epsilon: {ai.epsilon:.3f}"
+            )
+
+        if args.save:
+            ai.save_model(args.save)
+        else:
+            ai.save_model(str(dqn_path))
+
+    ai.stop_training()
+
+    console.print("\n[bold green]Training complete![/bold green]")
+    console.print(f"Best score: {best_score}")
+    console.print(f"Final epsilon: {ai.epsilon:.3f}")
+
+    if args.save:
+        console.print(f"Model saved to: {args.save}")
+    else:
+        console.print("Model saved to: dqn_model.pkl")
 
     return 0
 
