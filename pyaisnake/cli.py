@@ -112,6 +112,12 @@ def create_parser() -> argparse.ArgumentParser:
         default="classic",
         help="Game mode (default: classic)",
     )
+    play_parser.add_argument(
+        "--record",
+        "-r",
+        type=str,
+        help="Record game to JSON file",
+    )
 
     # AI command
     ai_parser = subparsers.add_parser("ai", help="Let AI play the game")
@@ -304,6 +310,34 @@ def create_parser() -> argparse.ArgumentParser:
         help="Color theme",
     )
 
+    # Replay command - play back recorded game
+    replay_parser = subparsers.add_parser("replay", help="Play back recorded game")
+    replay_parser.add_argument(
+        "file",
+        type=str,
+        help="Path to replay JSON file",
+    )
+    replay_parser.add_argument(
+        "--speed",
+        "-s",
+        type=float,
+        default=1.0,
+        help="Playback speed multiplier (default: 1.0)",
+    )
+
+    # Analyze command - analyze recorded game
+    analyze_parser = subparsers.add_parser("analyze", help="Analyze recorded game")
+    analyze_parser.add_argument(
+        "file",
+        type=str,
+        help="Path to replay JSON file",
+    )
+    analyze_parser.add_argument(
+        "--heatmap",
+        action="store_true",
+        help="Show position heatmap",
+    )
+
     return parser
 
 
@@ -405,19 +439,32 @@ def cmd_play(args: argparse.Namespace) -> int:
     )
 
     if KEYBOARD_AVAILABLE:
-        return _play_keyboard(game, renderer, config)
+        return _play_keyboard(game, renderer, config, getattr(args, "record", None))
     else:
         return _play_fallback(game, renderer, config)
 
 
-def _play_keyboard(game: SnakeGame, renderer: CLIRenderer, config: GameConfig) -> int:
+def _play_keyboard(
+    game: SnakeGame, renderer: CLIRenderer, config: GameConfig, record_path: str | None = None
+) -> int:
     """Play with keyboard library using Live display"""
     import keyboard
+
+    from .replay import ReplayRecorder
 
     running = True
     achievement_system = AchievementSystem()
     achievement_system.start_session()
     unlocked_queue: list[Achievement] = []
+
+    recorder: ReplayRecorder | None = None
+    if record_path:
+        recorder = ReplayRecorder(
+            game_mode=config.game_mode.value,
+            width=config.width,
+            height=config.height,
+            speed_ms=config.speed_ms,
+        )
 
     def on_achievement_unlock(achievement: Achievement) -> None:
         unlocked_queue.append(achievement)
@@ -451,6 +498,15 @@ def _play_keyboard(game: SnakeGame, renderer: CLIRenderer, config: GameConfig) -
             if game.state == GameState.RUNNING:
                 game.update()
 
+                if recorder:
+                    recorder.record_frame(
+                        snake=game.snake,
+                        direction=game.direction.value,
+                        food=game.food,
+                        score=game.stats.score,
+                        state=game.state.value,
+                    )
+
                 safe = game.get_safe_directions()
                 if len(safe) == 1:
                     achievement_system.record_close_call()
@@ -475,18 +531,36 @@ def _play_keyboard(game: SnakeGame, renderer: CLIRenderer, config: GameConfig) -
                 renderer.update()
                 time.sleep(0.1)
             elif game.state == GameState.GAME_OVER:
+                if recorder:
+                    recorder.finalize(
+                        final_score=game.stats.score,
+                        final_length=len(game.snake),
+                        duration=game.stats.duration,
+                    )
+                    recorder = None
                 renderer.update()
                 key = keyboard.read_event()
                 if key and key.event_type == keyboard.KEY_DOWN:
                     if key.name == "r":
                         game.reset()
                         achievement_system.start_session()
+                        if record_path:
+                            recorder = ReplayRecorder(
+                                game_mode=config.game_mode.value,
+                                width=config.width,
+                                height=config.height,
+                                speed_ms=config.speed_ms,
+                            )
                     elif key.name in ("q", "esc"):
                         break
 
     finally:
         renderer.stop_live()
         keyboard.unhook_all()
+
+    if record_path and "recorder" in dir() and recorder:
+        recorder.save(record_path)
+        console.print(f"[green]Replay saved to: {record_path}[/green]")
 
     console.print(f"\n[cyan]Final score:[/cyan] [bold]{game.stats.score}[/bold]")
     console.print(f"[cyan]Power-ups collected:[/cyan] {game.stats.power_ups_collected}")
@@ -1352,6 +1426,180 @@ def _play_level(game: SnakeGame, renderer: CLIRenderer, config: GameConfig, leve
     return 0
 
 
+def cmd_replay(args: argparse.Namespace) -> int:
+    """Play back a recorded game"""
+    from .replay import ReplayPlayer
+
+    replay_path = Path(args.file)
+    if not replay_path.exists():
+        console.print(f"[red]Replay file not found: {args.file}[/red]")
+        return 1
+
+    player = ReplayPlayer.load(str(replay_path))
+    player.speed_multiplier = args.speed
+
+    console.print(
+        Panel.fit(
+            f"[bold green]Replay Playback[/bold green]\n\n"
+            f"[cyan]File:[/cyan] {args.file}\n"
+            f"[cyan]Frames:[/cyan] {player.total_frames}\n"
+            f"[cyan]Speed:[/cyan] {args.speed}x\n"
+            f"[cyan]Duration:[/cyan] {player.recording.duration:.1f}s\n"
+            f"[cyan]Final Score:[/cyan] {player.recording.final_score}\n\n"
+            "[dim]Controls: Space=Pause, Q=Quit, Left/Right=Seek[/dim]\n"
+            "[dim]Press any key to start...[/dim]",
+            border_style="cyan",
+        )
+    )
+
+    import keyboard
+
+    paused = False
+    running = True
+
+    def toggle_pause():
+        nonlocal paused
+        paused = not paused
+
+    def quit_replay():
+        nonlocal running
+        running = False
+
+    def seek_back():
+        player.seek(player.current_frame - 10)
+
+    def seek_forward():
+        player.seek(player.current_frame + 10)
+
+    keyboard.add_hotkey("space", toggle_pause)
+    keyboard.add_hotkey("q", quit_replay)
+    keyboard.add_hotkey("esc", quit_replay)
+    keyboard.add_hotkey("left", seek_back)
+    keyboard.add_hotkey("right", seek_forward)
+
+    keyboard.read_event()
+
+    try:
+        while running and not player.is_finished:
+            frame = player.get_frame()
+            if not frame:
+                break
+
+            field_lines = _render_replay_frame(frame, player.recording)
+            progress = f"[{player.current_frame}/{player.total_frames}]"
+            status = "⏸ PAUSED" if paused else "▶ PLAYING"
+            console.print(f"\033[H\033[J{field_lines}\n{progress} {status}")
+
+            if not paused:
+                player.next_frame()
+
+            delay = (player.recording.speed_ms / 1000) / args.speed
+            time.sleep(delay)
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        keyboard.unhook_all()
+
+    console.print("\n[cyan]Replay finished[/cyan]")
+    return 0
+
+
+def _render_replay_frame(frame, recording) -> str:
+    """Render a replay frame as ASCII"""
+    lines = []
+    w, h = recording.width, recording.height
+
+    border = "═" * w
+    lines.append(f"╔{border}╗")
+
+    snake_set = set(frame.snake)
+    head = frame.snake[0] if frame.snake else None
+
+    for y in range(h):
+        row_parts = ["║"]
+        for x in range(w):
+            pos = (x, y)
+            if pos == head:
+                row_parts.append("@@")
+            elif pos in snake_set:
+                row_parts.append("oo")
+            elif pos == frame.food:
+                row_parts.append("🍎")
+            else:
+                row_parts.append("  ")
+        row_parts.append("║")
+        lines.append("".join(row_parts))
+
+    lines.append(f"╚{border}╝")
+    lines.append(f"Score: {frame.score} | Length: {len(frame.snake)} | Dir: {frame.direction}")
+
+    return "\n".join(lines)
+
+
+def cmd_analyze(args: argparse.Namespace) -> int:
+    """Analyze a recorded game"""
+    from .replay import ReplayAnalyzer
+
+    replay_path = Path(args.file)
+    if not replay_path.exists():
+        console.print(f"[red]Replay file not found: {args.file}[/red]")
+        return 1
+
+    analyzer = ReplayAnalyzer.load(str(replay_path))
+    stats = analyzer.get_statistics()
+
+    console.print(Panel.fit("[bold cyan]📊 Replay Analysis[/bold cyan]", border_style="cyan"))
+
+    table = Table(show_header=False, box=None, padding=(0, 2))
+    table.add_column(justify="right", style="cyan")
+    table.add_column(style="bold white")
+
+    table.add_row("Duration", f"{stats.get('duration', 0):.1f}s")
+    table.add_row("Total Frames", str(stats.get("total_frames", 0)))
+    table.add_row("Final Score", str(stats.get("final_score", 0)))
+    table.add_row("Final Length", str(stats.get("final_length", 0)))
+    table.add_row("Food Collected", str(stats.get("food_collected", 0)))
+    table.add_row("Avg FPS", str(stats.get("avg_fps", 0)))
+    table.add_row("Efficiency", f"{stats.get('efficiency', 0):.3f}")
+
+    console.print(table)
+
+    if directions := stats.get("direction_distribution"):
+        console.print("\n[bold]Direction Distribution:[/bold]")
+        dir_table = Table(show_header=True)
+        dir_table.add_column("Direction", style="cyan")
+        dir_table.add_column("Count", style="white")
+        dir_table.add_column("Percentage", style="yellow")
+
+        total = sum(directions.values())
+        for direction, count in sorted(directions.items()):
+            pct = f"{count / total * 100:.1f}%" if total > 0 else "0%"
+            dir_table.add_row(direction, str(count), pct)
+
+        console.print(dir_table)
+
+    key_moments = analyzer.find_key_moments()
+    if key_moments:
+        console.print("\n[bold]Key Moments:[/bold]")
+        for moment in key_moments[:10]:
+            frame = moment.get("frame", 0)
+            event_type = moment.get("type", "unknown")
+            if event_type == "food_eaten":
+                console.print(f"  Frame {frame}: 🍎 Food eaten (score: {moment.get('score', 0)})")
+            elif event_type == "death":
+                console.print(f"  Frame {frame}: 💀 Death (score: {moment.get('score', 0)})")
+
+    if args.heatmap:
+        console.print("\n[bold]Position Heatmap:[/bold]")
+        heatmap = analyzer.get_heatmap_data()
+        top_positions = sorted(heatmap.items(), key=lambda x: x[1], reverse=True)[:10]
+        for pos, count in top_positions:
+            console.print(f"  {pos}: {count} visits")
+
+    return 0
+
+
 def main() -> int:
     """Main entry point"""
     parser = create_parser()
@@ -1379,6 +1627,10 @@ def main() -> int:
         return cmd_levels(args)
     elif args.command == "level":
         return cmd_level(args)
+    elif args.command == "replay":
+        return cmd_replay(args)
+    elif args.command == "analyze":
+        return cmd_analyze(args)
 
     return 0
 
