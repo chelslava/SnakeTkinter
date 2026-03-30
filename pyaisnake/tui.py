@@ -31,7 +31,7 @@ class GameWidget(Static):
         config = self.game.config
         w, h = config.width, config.height
 
-        border = "═" * w
+        border = "══" * w
         lines.append(f"╔{border}╗")
 
         snake_set = set(self.game.snake)
@@ -43,13 +43,13 @@ class GameWidget(Static):
             for x in range(w):
                 pos = (x, y)
                 if pos == head:
-                    row_parts.append("[bold bright_green]██[/bold bright_green]")
+                    row_parts.append("@@")
                 elif pos in snake_set:
-                    row_parts.append("[green]▓▓[/green]")
+                    row_parts.append("oo")
                 elif pos == food:
-                    row_parts.append("[bold bright_red]🍎[/bold bright_red]")
+                    row_parts.append("**")
                 elif pos in self.game.obstacles:
-                    row_parts.append("[dim yellow]▒▒[/dim yellow]")
+                    row_parts.append("##")
                 else:
                     row_parts.append("  ")
             row_parts.append("║")
@@ -59,11 +59,11 @@ class GameWidget(Static):
 
         status = ""
         if self.game.state == GameState.PAUSED:
-            status = " [bold yellow]⏸ PAUSED[/bold yellow]"
+            status = " [PAUSED]"
         elif self.game.state == GameState.GAME_OVER:
-            status = " [bold red]☠ GAME OVER[/bold red]"
+            status = " [GAME OVER]"
         elif self.game.state == GameState.WIN:
-            status = " [bold bright_green]🏆 WIN![/bold bright_green]"
+            status = " [WIN!]"
 
         lines.append(f"Score: {self.game.stats.score} | Length: {len(self.game.snake)}{status}")
 
