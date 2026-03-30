@@ -751,34 +751,141 @@ class RandomAI:
 
 
 class AStarAI:
-    """A* pathfinding AI"""
+    """A* pathfinding AI with trap avoidance"""
 
     def __init__(self, game: SnakeGame):
         self.game = game
+        self._path: list[tuple[int, int]] = []
+        self._last_food: tuple[int, int] | None = None
 
     def get_direction(self) -> Direction | None:
         if not self.game.food:
-            return None
+            return self._get_safe_direction()
 
         head = self.game.snake[0]
         food = self.game.food
 
-        dx = food[0] - head[0]
-        dy = food[1] - head[1]
+        if food != self._last_food or not self._path:
+            self._path = self._find_path(head, food)
+            self._last_food = food
 
-        if abs(dx) > abs(dy):
-            preferred = Direction.RIGHT if dx > 0 else Direction.LEFT
+        if self._path:
+            next_pos = self._path[0]
+            self._path = self._path[1:]
+            return self._pos_to_direction(head, next_pos)
+
+        return self._get_safe_direction()
+
+    def _find_path(self, start: tuple[int, int], goal: tuple[int, int]) -> list[tuple[int, int]]:
+        import heapq
+
+        snake_set = set(self.game.snake)
+        obstacles = self.game.obstacles
+        width = self.game.config.width
+        height = self.game.config.height
+
+        open_set: list[tuple[int, tuple[int, int]]] = [(0, start)]
+        came_from: dict[tuple[int, int], tuple[int, int]] = {}
+        g_score: dict[tuple[int, int], int] = {start: 0}
+
+        while open_set:
+            _, current = heapq.heappop(open_set)
+
+            if current == goal:
+                return self._reconstruct_path(came_from, current)
+
+            for dx, dy in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
+                neighbor = (current[0] + dx, current[1] + dy)
+
+                if not (0 <= neighbor[0] < width and 0 <= neighbor[1] < height):
+                    continue
+
+                if neighbor in snake_set and neighbor != self.game.snake[-1]:
+                    continue
+
+                if neighbor in obstacles:
+                    continue
+
+                tentative_g = g_score[current] + 1
+
+                if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g
+                    f_score = tentative_g + abs(neighbor[0] - goal[0]) + abs(neighbor[1] - goal[1])
+                    heapq.heappush(open_set, (f_score, neighbor))
+
+        return []
+
+    def _reconstruct_path(
+        self, came_from: dict[tuple[int, int], tuple[int, int]], current: tuple[int, int]
+    ) -> list[tuple[int, int]]:
+        path = []
+        while current in came_from:
+            path.append(current)
+            current = came_from[current]
+        path.reverse()
+        return path
+
+    def _pos_to_direction(self, head: tuple[int, int], next_pos: tuple[int, int]) -> Direction:
+        dx = next_pos[0] - head[0]
+        dy = next_pos[1] - head[1]
+
+        if dy < 0:
+            return Direction.UP
+        elif dy > 0:
+            return Direction.DOWN
+        elif dx < 0:
+            return Direction.LEFT
         else:
-            preferred = Direction.DOWN if dy > 0 else Direction.UP
+            return Direction.RIGHT
 
+    def _get_safe_direction(self) -> Direction | None:
         safe = self.game.get_safe_directions()
+        if not safe:
+            return None
 
-        if preferred in safe:
-            return preferred
-        elif safe:
-            return safe[0]
+        best_dir = None
+        best_space = -1
 
-        return None
+        for direction in safe:
+            space = self._count_accessible_space(direction)
+            if space > best_space:
+                best_space = space
+                best_dir = direction
+
+        return best_dir
+
+    def _count_accessible_space(self, direction: Direction) -> int:
+        head = self.game.snake[0]
+        dx, dy = {
+            Direction.UP: (0, -1),
+            Direction.DOWN: (0, 1),
+            Direction.LEFT: (-1, 0),
+            Direction.RIGHT: (1, 0),
+        }[direction]
+
+        new_head = (head[0] + dx, head[1] + dy)
+
+        visited = {new_head}
+        queue = [new_head]
+        snake_set = set(self.game.snake)
+        obstacles = self.game.obstacles
+
+        while queue:
+            pos = queue.pop(0)
+            for ddx, ddy in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
+                npos = (pos[0] + ddx, pos[1] + ddy)
+                if (
+                    0 <= npos[0] < self.game.config.width
+                    and 0 <= npos[1] < self.game.config.height
+                    and npos not in visited
+                    and npos not in snake_set
+                    and npos not in obstacles
+                ):
+                    visited.add(npos)
+                    queue.append(npos)
+
+        return len(visited)
 
 
 class NeuralAI:

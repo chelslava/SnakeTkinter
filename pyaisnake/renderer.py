@@ -2,6 +2,10 @@
 CLI Renderer - Rich-based terminal rendering for Snake game.
 """
 
+import math
+import random
+import time
+from dataclasses import dataclass, field
 from enum import Enum
 
 from rich.console import Console
@@ -10,6 +14,31 @@ from rich.panel import Panel
 from rich.table import Table
 
 from .engine import Direction, GameMode, GameState, PowerUpType, SnakeGame
+
+
+@dataclass
+class Particle:
+    """Animation particle"""
+
+    x: float
+    y: float
+    vx: float
+    vy: float
+    char: str
+    color: str
+    life: float
+    created: float = field(default_factory=time.time)
+
+
+@dataclass
+class ScorePopup:
+    """Score popup animation"""
+
+    x: int
+    y: int
+    text: str
+    color: str
+    created: float = field(default_factory=time.time)
 
 
 class Theme(Enum):
@@ -202,6 +231,9 @@ class CLIRenderer:
         PowerUpType.MUSHROOM: "mushroom",
     }
 
+    DEATH_CHARS = ["✷", "✶", "✵", "✴", "✳", "✲", "✱", "★", "☆", "◆"]
+    EAT_CHARS = ["·", "•", "●", "○", "◎", "◉", "◎"]
+
     def __init__(
         self,
         game: SnakeGame,
@@ -213,6 +245,11 @@ class CLIRenderer:
         self.theme = theme
         self._load_theme()
         self._live: Live | None = None
+        self._particles: list[Particle] = []
+        self._popups: list[ScorePopup] = []
+        self._last_score: int = 0
+        self._last_length: int = 0
+        self._death_triggered: bool = False
 
     def _load_theme(self) -> None:
         """Load theme configuration"""
@@ -224,6 +261,89 @@ class CLIRenderer:
         """Change theme"""
         self.theme = theme
         self._load_theme()
+
+    def trigger_death_animation(self) -> None:
+        """Trigger death explosion at snake head"""
+        if self._death_triggered:
+            return
+        self._death_triggered = True
+
+        head = self.game.snake[0] if self.game.snake else (0, 0)
+        for _ in range(25):
+            angle = random.uniform(0, 6.28)
+            speed = random.uniform(1.5, 4.0)
+            self._particles.append(
+                Particle(
+                    x=float(head[0]),
+                    y=float(head[1]),
+                    vx=math.cos(angle) * speed,
+                    vy=math.sin(angle) * speed,
+                    char=random.choice(self.DEATH_CHARS),
+                    color=random.choice(["bright_red", "red", "yellow", "orange"]),
+                    life=random.uniform(0.5, 1.5),
+                )
+            )
+
+    def trigger_eat_animation(self, x: int, y: int) -> None:
+        """Trigger food eating particles"""
+        for _ in range(12):
+            angle = random.uniform(0, 6.28)
+            speed = random.uniform(0.5, 2.0)
+            self._particles.append(
+                Particle(
+                    x=float(x),
+                    y=float(y),
+                    vx=math.cos(angle) * speed,
+                    vy=math.sin(angle) * speed,
+                    char=random.choice(self.EAT_CHARS),
+                    color="bright_yellow",
+                    life=random.uniform(0.3, 0.8),
+                )
+            )
+
+    def add_score_popup(self, x: int, y: int, points: int) -> None:
+        """Add score popup at position"""
+        color = "bright_green" if points > 0 else "red"
+        text = f"+{points}" if points > 0 else str(points)
+        self._popups.append(ScorePopup(x=x, y=y, text=text, color=color))
+
+    def _update_animations(self) -> None:
+        """Update and clean up animations"""
+        now = time.time()
+
+        self._particles = [
+            Particle(
+                x=p.x + p.vx * 0.1,
+                y=p.y + p.vy * 0.1,
+                vx=p.vx * 0.95,
+                vy=p.vy * 0.95 + 0.2,
+                char=p.char,
+                color=p.color,
+                life=p.life,
+                created=p.created,
+            )
+            for p in self._particles
+            if now - p.created < p.life
+        ]
+
+        self._popups = [p for p in self._popups if now - p.created < 1.0]
+
+        if self.game.state == GameState.GAME_OVER and not self._death_triggered:
+            self.trigger_death_animation()
+
+        if self.game.stats.score > self._last_score:
+            diff = self.game.stats.score - self._last_score
+            if self.game.food:
+                self.add_score_popup(self.game.food[0], self.game.food[1], diff)
+                self.trigger_eat_animation(self.game.food[0], self.game.food[1])
+            self._last_score = self.game.stats.score
+
+        if len(self.game.snake) < self._last_length and self.game.food:
+            self.trigger_eat_animation(self.game.food[0], self.game.food[1])
+        self._last_length = len(self.game.snake)
+
+        if self.game.state == GameState.RUNNING:
+            self._death_triggered = False
 
     def start_live(self) -> None:
         """Start live display mode for smooth rendering"""
@@ -243,6 +363,7 @@ class CLIRenderer:
 
     def update(self) -> None:
         """Update display without flickering"""
+        self._update_animations()
         if self._live:
             self._live.update(self._generate_frame())
         else:
@@ -307,21 +428,45 @@ class CLIRenderer:
         lines = []
         config = self.game.config
 
-        # Top border
         border = self.symbols["border_h"] * config.width
         lines.append(f"{self.symbols['border_tl']}{border}{self.symbols['border_tr']}")
 
-        # Pre-compute for O(1) lookup
         snake_set = set(self.game.snake)
         head = self.game.snake[0] if self.game.snake else None
         food = self.game.food
 
-        # Game field
+        now = time.time()
+        active_particles: dict[tuple[int, int], list[Particle]] = {}
+        for p in self._particles:
+            px, py = int(p.x), int(p.y)
+            if 0 <= px < config.width and 0 <= py < config.height:
+                if (px, py) not in active_particles:
+                    active_particles[(px, py)] = []
+                active_particles[(px, py)].append(p)
+
+        active_popups: dict[tuple[int, int], ScorePopup] = {}
+        for popup in self._popups:
+            if popup.y >= 0:
+                active_popups[(popup.x, popup.y)] = popup
+
         for y in range(config.height):
             row_parts = [self.symbols["border_v"]]
 
             for x in range(config.width):
                 pos = (x, y)
+
+                if pos in active_popups:
+                    popup = active_popups[pos]
+                    age = now - popup.created
+                    if age < 1.0:
+                        row_parts.append(f"[{popup.color}]{popup.text}[/{popup.color}]")
+                        continue
+
+                if pos in active_particles:
+                    particles = active_particles[pos]
+                    p = particles[0]
+                    row_parts.append(f"[{p.color}]{p.char}[/{p.color}]")
+                    continue
 
                 if pos == head:
                     row_parts.append(self._colorize(self.symbols["head"], "head"))
@@ -338,7 +483,6 @@ class CLIRenderer:
             row_parts.append(self.symbols["border_v"])
             lines.append("".join(row_parts))
 
-        # Bottom border
         lines.append(f"{self.symbols['border_bl']}{border}{self.symbols['border_br']}")
 
         return "\n".join(lines)
