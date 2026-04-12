@@ -480,9 +480,8 @@ class SnakeGame:
             self.stats.score += int(1 * self.score_multiplier)
             self.stats.food_eaten += 1
             # Shrink snake by 3 segments (minimum length 3)
-            while len(self.snake) > 3 and len(self.snake) > len(self.snake) - 3:
-                if len(self.snake) > 3:
-                    self.snake.pop()
+            shrink_to = max(3, len(self.snake) - 3)
+            del self.snake[shrink_to:]
 
         if self.on_food_eaten:
             self.on_food_eaten()
