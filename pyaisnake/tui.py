@@ -354,6 +354,13 @@ class GameScreen(Screen):
     def action_quit_game(self) -> None:
         self.app.pop_screen()
 
+    def set_theme(self, theme: Theme) -> None:
+        """Apply a new visual theme to the active game screen."""
+        self.theme = theme
+        game_field = self.query_one(GameField)
+        game_field.theme = theme
+        game_field.refresh()
+
 
 class MainMenuScreen(Screen):
     """Main menu screen with options"""
@@ -424,13 +431,13 @@ class MainMenuScreen(Screen):
 
         if button_id == "classic":
             config = GameConfig(width=40, height=20, speed_ms=120)
-            self.app.push_screen(GameScreen(config))
+            self.app.push_screen(GameScreen(config, theme=self.app.current_theme))
         elif button_id == "speed":
             config = GameConfig(width=40, height=20, speed_ms=60)
-            self.app.push_screen(GameScreen(config))
+            self.app.push_screen(GameScreen(config, theme=self.app.current_theme))
         elif button_id == "challenge":
             config = GameConfig(width=25, height=15, speed_ms=80)
-            self.app.push_screen(GameScreen(config))
+            self.app.push_screen(GameScreen(config, theme=self.app.current_theme))
         elif button_id == "theme":
             self.app.next_theme()
         elif button_id == "quit":
@@ -438,11 +445,11 @@ class MainMenuScreen(Screen):
 
     def action_play_classic(self) -> None:
         config = GameConfig(width=40, height=20, speed_ms=120)
-        self.app.push_screen(GameScreen(config))
+        self.app.push_screen(GameScreen(config, theme=self.app.current_theme))
 
     def action_play_speed(self) -> None:
         config = GameConfig(width=40, height=20, speed_ms=60)
-        self.app.push_screen(GameScreen(config))
+        self.app.push_screen(GameScreen(config, theme=self.app.current_theme))
 
 
 class PyAISnakeTUI(App):
@@ -467,12 +474,21 @@ class PyAISnakeTUI(App):
     _themes = [Theme.DEFAULT, Theme.NEON, Theme.RETRO]
     _theme_index = 0
 
+    @property
+    def current_theme(self) -> Theme:
+        """Return the currently selected visual theme."""
+        return self._themes[self._theme_index]
+
     def on_mount(self) -> None:
         self.push_screen("menu")
 
     def action_next_theme(self) -> None:
         self._theme_index = (self._theme_index + 1) % len(self._themes)
-        theme_name = self._themes[self._theme_index].value
+        theme = self.current_theme
+        if isinstance(self.screen, GameScreen):
+            self.screen.set_theme(theme)
+
+        theme_name = theme.value
         self.notify(f"Theme: {theme_name}", title="Theme Changed")
 
 
