@@ -4,7 +4,7 @@ Tests for PyAISnake engine.
 
 import unittest
 
-from pyaisnake.engine import Direction, GameConfig, GameState, SnakeGame
+from pyaisnake.engine import Direction, GameConfig, GameState, PowerUp, PowerUpType, SnakeGame
 
 
 class TestSnakeGame(unittest.TestCase):
@@ -141,6 +141,28 @@ class TestSnakeGame(unittest.TestCase):
 
         # Should have obstacles
         self.assertEqual(len(game.obstacles), 5)
+
+    def test_mushroom_shrinks_snake_by_three_segments(self):
+        """Test mushroom shrinks the snake by up to three segments"""
+        self.game.snake = [(x, 5) for x in range(8, 0, -1)]
+        self.game.current_power_up = PowerUp(PowerUpType.MUSHROOM, position=(0, 0))
+
+        self.game._collect_power_up()
+
+        self.assertEqual(len(self.game.snake), 5)
+        self.assertEqual(self.game.stats.score, 1)
+        self.assertEqual(self.game.stats.food_eaten, 1)
+
+    def test_mushroom_keeps_minimum_snake_length(self):
+        """Test mushroom does not shrink the snake below length three"""
+        self.game.snake = [(x, 5) for x in range(5, 0, -1)]
+        self.game.current_power_up = PowerUp(PowerUpType.MUSHROOM, position=(0, 0))
+
+        self.game._collect_power_up()
+
+        self.assertEqual(len(self.game.snake), 3)
+        self.assertEqual(self.game.stats.score, 1)
+        self.assertEqual(self.game.stats.food_eaten, 1)
 
 
 class TestGameConfig(unittest.TestCase):

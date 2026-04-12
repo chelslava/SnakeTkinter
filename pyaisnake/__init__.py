@@ -17,9 +17,15 @@ Usage:
         print(game.render_ascii())
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 from .controller import CLIController
 from .engine import Direction, GameConfig, GameState, SnakeGame
-from .renderer import CLIRenderer
+
+if TYPE_CHECKING:
+    from .renderer import CLIRenderer
 
 __version__ = "2.9.0"
 __all__ = [
@@ -30,3 +36,12 @@ __all__ = [
     "CLIRenderer",
     "CLIController",
 ]
+
+
+def __getattr__(name: str) -> Any:
+    """Lazily resolve optional UI exports."""
+    if name == "CLIRenderer":
+        from .renderer import CLIRenderer as renderer_class
+
+        return renderer_class
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
