@@ -277,38 +277,49 @@ class GameScreen(Screen):
     def on_mount(self) -> None:
         self._running = True
         self._timer = self.set_interval(self.config.speed_ms / 1000, self.game_tick)
+        self._refresh_view("")
 
     def on_unmount(self) -> None:
         if self._timer:
             self._timer.stop()
 
+    def _refresh_view(self, message: str | None = None) -> None:
+        """Refresh all game widgets from the current game state."""
+        if not self.game:
+            return
+
+        title_bar = self.query_one(TitleBar)
+        game_field = self.query_one(GameField)
+        stats_panel = self.query_one(StatsPanel)
+        message_bar = self.query_one("#message-bar", Static)
+
+        title_bar.game = self.game
+        game_field.game = self.game
+        stats_panel.game = self.game
+
+        title_bar.refresh()
+        game_field.refresh()
+        stats_panel.refresh()
+
+        if message is not None:
+            message_bar.update(message)
+            message_bar.refresh()
+
     def game_tick(self) -> None:
         if self.game and self.game.state == GameState.RUNNING and self._running:
             self.game.update()
-
-            title_bar = self.query_one(TitleBar)
-            game_field = self.query_one(GameField)
-            stats_panel = self.query_one(StatsPanel)
-            message_bar = self.query_one("#message-bar", Static)
-
-            title_bar.game = self.game
-            game_field.game = self.game
-            stats_panel.game = self.game
-
-            title_bar.refresh()
-            game_field.refresh()
-            stats_panel.refresh()
+            message = None
 
             if self.game.state == GameState.GAME_OVER:
                 self._running = False
-                message_bar.update(
-                    "[bold red]☠ GAME OVER! Press R to restart or Q for menu[/bold red]"
-                )
+                message = "[bold red]☠ GAME OVER! Press R to restart or Q for menu[/bold red]"
             elif self.game.state == GameState.WIN:
                 self._running = False
-                message_bar.update(
+                message = (
                     "[bold bright_green]🏆 YOU WIN! Press R to restart or Q for menu[/bold bright_green]"
                 )
+
+            self._refresh_view(message)
 
     def action_move_up(self) -> None:
         if self.game:
@@ -329,17 +340,16 @@ class GameScreen(Screen):
     def action_toggle_pause(self) -> None:
         if self.game:
             self.game.pause()
-            message_bar = self.query_one("#message-bar", Static)
             if self.game.state == GameState.PAUSED:
-                message_bar.update("[bold yellow]⏸ PAUSED - Press P to continue[/bold yellow]")
+                self._refresh_view("[bold yellow]⏸ PAUSED - Press P to continue[/bold yellow]")
             else:
-                message_bar.update("")
+                self._refresh_view("")
 
     def action_restart(self) -> None:
         if self.game:
             self.game.reset()
             self._running = True
-            self.query_one("#message-bar", Static).update("")
+            self._refresh_view("")
 
     def action_quit_game(self) -> None:
         self.app.pop_screen()
